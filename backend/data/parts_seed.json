@@ -1,0 +1,384 @@
+[
+  {
+    "id": "cpu-r5-9600x",
+    "category": "cpu",
+    "name": "AMD 锐龙5 9600X",
+    "brand": "AMD",
+    "list_price": 1599,
+    "search_keywords": "锐龙5 9600X",
+    "specs": {
+      "socket": "AM5",
+      "cores": 6,
+      "threads": 12,
+      "tdp": 65,
+      "memory": "DDR5",
+      "igpu": true
+    }
+  },
+  {
+    "id": "cpu-r7-9700x",
+    "category": "cpu",
+    "name": "AMD 锐龙7 9700X",
+    "brand": "AMD",
+    "list_price": 2299,
+    "search_keywords": "锐龙7 9700X",
+    "specs": {
+      "socket": "AM5",
+      "cores": 8,
+      "threads": 16,
+      "tdp": 65,
+      "memory": "DDR5",
+      "igpu": true
+    }
+  },
+  {
+    "id": "cpu-r7-9800x3d",
+    "category": "cpu",
+    "name": "AMD 锐龙7 9800X3D",
+    "brand": "AMD",
+    "list_price": 3499,
+    "search_keywords": "锐龙7 9800X3D",
+    "specs": {
+      "socket": "AM5",
+      "cores": 8,
+      "threads": 16,
+      "tdp": 120,
+      "memory": "DDR5",
+      "igpu": false
+    }
+  },
+  {
+    "id": "cpu-i5-14600kf",
+    "category": "cpu",
+    "name": "英特尔 酷睿 i5-14600KF",
+    "brand": "Intel",
+    "list_price": 1299,
+    "search_keywords": "i5-14600KF",
+    "specs": {
+      "socket": "LGA1700",
+      "cores": 14,
+      "threads": 20,
+      "tdp": 125,
+      "memory": "DDR5",
+      "igpu": false
+    }
+  },
+  {
+    "id": "mb-b850m-tuf",
+    "category": "motherboard",
+    "name": "华硕 TUF GAMING B850M-PLUS WIFI",
+    "brand": "华硕",
+    "list_price": 1499,
+    "search_keywords": "华硕 B850M-PLUS WIFI",
+    "specs": {
+      "socket": "AM5",
+      "chipset": "B850",
+      "form_factor": "mATX",
+      "memory": "DDR5",
+      "max_memory_mhz": 8000,
+      "wifi": true
+    }
+  },
+  {
+    "id": "mb-b850m-msi",
+    "category": "motherboard",
+    "name": "微星 B850M GAMING PLUS WIFI",
+    "brand": "微星",
+    "list_price": 1299,
+    "search_keywords": "微星 B850M GAMING PLUS",
+    "specs": {
+      "socket": "AM5",
+      "chipset": "B850",
+      "form_factor": "mATX",
+      "memory": "DDR5",
+      "max_memory_mhz": 7800,
+      "wifi": true
+    }
+  },
+  {
+    "id": "mb-b760m-mortar",
+    "category": "motherboard",
+    "name": "微星 MAG B760M MORTAR WIFI",
+    "brand": "微星",
+    "list_price": 999,
+    "search_keywords": "微星 B760M 迫击炮",
+    "specs": {
+      "socket": "LGA1700",
+      "chipset": "B760",
+      "form_factor": "mATX",
+      "memory": "DDR5",
+      "max_memory_mhz": 7200,
+      "wifi": true
+    }
+  },
+  {
+    "id": "gpu-rx-9060xt",
+    "category": "gpu",
+    "name": "蓝宝石 RX 9060 XT 16G",
+    "brand": "蓝宝石",
+    "list_price": 2699,
+    "search_keywords": "RX 9060 XT 16G",
+    "specs": {
+      "vram_gb": 16,
+      "tdp": 160,
+      "length_mm": 280,
+      "power_connectors": "1x8pin",
+      "tier": 1
+    }
+  },
+  {
+    "id": "gpu-rx-9070-gre",
+    "category": "gpu",
+    "name": "蓝宝石 RX 9070 GRE 12G",
+    "brand": "蓝宝石",
+    "list_price": 3199,
+    "search_keywords": "RX 9070 GRE 12G",
+    "specs": {
+      "vram_gb": 12,
+      "tdp": 220,
+      "length_mm": 320,
+      "power_connectors": "2x8pin",
+      "tier": 2
+    }
+  },
+  {
+    "id": "gpu-rx-9070",
+    "category": "gpu",
+    "name": "讯景 RX 9070 16G",
+    "brand": "讯景",
+    "list_price": 4299,
+    "search_keywords": "RX 9070 16G",
+    "specs": {
+      "vram_gb": 16,
+      "tdp": 220,
+      "length_mm": 330,
+      "power_connectors": "2x8pin",
+      "tier": 3
+    }
+  },
+  {
+    "id": "gpu-rtx-5060ti",
+    "category": "gpu",
+    "name": "七彩虹 RTX 5060 Ti 16G",
+    "brand": "七彩虹",
+    "list_price": 3599,
+    "search_keywords": "RTX 5060 Ti 16G",
+    "specs": {
+      "vram_gb": 16,
+      "tdp": 180,
+      "length_mm": 305,
+      "power_connectors": "1x8pin",
+      "tier": 2
+    }
+  },
+  {
+    "id": "ram-32g-6000",
+    "category": "memory",
+    "name": "金士顿 FURY 32GB(16x2) DDR5 6000",
+    "brand": "金士顿",
+    "list_price": 699,
+    "search_keywords": "金士顿 DDR5 6000 32G",
+    "specs": {
+      "type": "DDR5",
+      "capacity_gb": 32,
+      "speed_mhz": 6000,
+      "modules": 2,
+      "expo": true
+    }
+  },
+  {
+    "id": "ram-32g-6400",
+    "category": "memory",
+    "name": "芝奇 幻光戟 32GB(16x2) DDR5 6400",
+    "brand": "芝奇",
+    "list_price": 899,
+    "search_keywords": "芝奇 幻光戟 DDR5 6400 32G",
+    "specs": {
+      "type": "DDR5",
+      "capacity_gb": 32,
+      "speed_mhz": 6400,
+      "modules": 2,
+      "expo": true
+    }
+  },
+  {
+    "id": "ram-16g-6000",
+    "category": "memory",
+    "name": "金士顿 FURY 16GB(8x2) DDR5 6000",
+    "brand": "金士顿",
+    "list_price": 399,
+    "search_keywords": "金士顿 DDR5 6000 16G",
+    "specs": {
+      "type": "DDR5",
+      "capacity_gb": 16,
+      "speed_mhz": 6000,
+      "modules": 2,
+      "expo": true
+    }
+  },
+  {
+    "id": "ssd-1tb-wd",
+    "category": "storage",
+    "name": "西部数据 SN7100 1TB NVMe",
+    "brand": "西部数据",
+    "list_price": 499,
+    "search_keywords": "WD SN7100 1TB",
+    "specs": {
+      "capacity_gb": 1000,
+      "interface": "NVMe",
+      "pcie": "4.0"
+    }
+  },
+  {
+    "id": "ssd-1tb-zhiti",
+    "category": "storage",
+    "name": "致态 TiPlus7100 1TB",
+    "brand": "致态",
+    "list_price": 469,
+    "search_keywords": "致态 TiPlus7100 1TB",
+    "specs": {
+      "capacity_gb": 1000,
+      "interface": "NVMe",
+      "pcie": "4.0"
+    }
+  },
+  {
+    "id": "ssd-2tb-zhiti",
+    "category": "storage",
+    "name": "致态 TiPlus7100 2TB",
+    "brand": "致态",
+    "list_price": 899,
+    "search_keywords": "致态 TiPlus7100 2TB",
+    "specs": {
+      "capacity_gb": 2000,
+      "interface": "NVMe",
+      "pcie": "4.0"
+    }
+  },
+  {
+    "id": "psu-650g",
+    "category": "psu",
+    "name": "海韵 FOCUS GX-650 金牌全模组",
+    "brand": "海韵",
+    "list_price": 549,
+    "search_keywords": "海韵 FOCUS GX 650",
+    "specs": {
+      "wattage": 650,
+      "efficiency": "Gold",
+      "modular": "full",
+      "atx31": true
+    }
+  },
+  {
+    "id": "psu-750g",
+    "category": "psu",
+    "name": "海韵 FOCUS GX-750 金牌全模组",
+    "brand": "海韵",
+    "list_price": 649,
+    "search_keywords": "海韵 FOCUS GX 750",
+    "specs": {
+      "wattage": 750,
+      "efficiency": "Gold",
+      "modular": "full",
+      "atx31": true
+    }
+  },
+  {
+    "id": "psu-850g",
+    "category": "psu",
+    "name": "振华 LEADEX III 850W 金牌全模组",
+    "brand": "振华",
+    "list_price": 699,
+    "search_keywords": "振华 LEADEX 850W",
+    "specs": {
+      "wattage": 850,
+      "efficiency": "Gold",
+      "modular": "full",
+      "atx31": true
+    }
+  },
+  {
+    "id": "cooler-pa120",
+    "category": "cooler",
+    "name": "利民 Peerless Assassin 120 SE",
+    "brand": "利民",
+    "list_price": 129,
+    "search_keywords": "利民 PA120 SE",
+    "specs": {
+      "type": "air",
+      "tdp_rating": 220,
+      "height_mm": 155,
+      "sockets": ["AM5", "AM4", "LGA1700"]
+    }
+  },
+  {
+    "id": "cooler-ax120",
+    "category": "cooler",
+    "name": "利民 Assassin X 120 Refined SE",
+    "brand": "利民",
+    "list_price": 79,
+    "search_keywords": "利民 AX120 Refined",
+    "specs": {
+      "type": "air",
+      "tdp_rating": 160,
+      "height_mm": 148,
+      "sockets": ["AM5", "AM4", "LGA1700"]
+    }
+  },
+  {
+    "id": "cooler-240aio",
+    "category": "cooler",
+    "name": "九州风神 LS720S 360 水冷",
+    "brand": "九州风神",
+    "list_price": 399,
+    "search_keywords": "九州风神 LS720",
+    "specs": {
+      "type": "aio",
+      "tdp_rating": 300,
+      "radiator_mm": 360,
+      "sockets": ["AM5", "AM4", "LGA1700"]
+    }
+  },
+  {
+    "id": "case-lianli-a3",
+    "category": "case",
+    "name": "联力 A3 木面板 mATX",
+    "brand": "联力",
+    "list_price": 399,
+    "search_keywords": "联力 A3",
+    "specs": {
+      "form_factors": ["mATX", "ITX"],
+      "gpu_max_mm": 415,
+      "cooler_max_mm": 165,
+      "psu_max_mm": 220
+    }
+  },
+  {
+    "id": "case-valkyrie",
+    "category": "case",
+    "name": "瓦尔基里 VK03 海景房",
+    "brand": "瓦尔基里",
+    "list_price": 269,
+    "search_keywords": "瓦尔基里 VK03",
+    "specs": {
+      "form_factors": ["ATX", "mATX", "ITX"],
+      "gpu_max_mm": 400,
+      "cooler_max_mm": 170,
+      "psu_max_mm": 200
+    }
+  },
+  {
+    "id": "case-lianli-011",
+    "category": "case",
+    "name": "联力 O11 Dynamic EVO",
+    "brand": "联力",
+    "list_price": 899,
+    "search_keywords": "联力 O11 EVO",
+    "specs": {
+      "form_factors": ["ATX", "mATX", "ITX"],
+      "gpu_max_mm": 420,
+      "cooler_max_mm": 167,
+      "psu_max_mm": 220
+    }
+  }
+]

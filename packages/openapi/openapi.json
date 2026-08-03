@@ -1,0 +1,1334 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "PEIZHI 国内装机配智 API",
+    "description": "API-first 装机推荐、兼容校验与多通道价格（目录链接 / SerpApi / 用户纠价权威库）",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/parts": {
+      "get": {
+        "tags": [
+          "parts"
+        ],
+        "summary": "List Parts",
+        "operationId": "list_parts_api_parts_get",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PartOut"
+                  },
+                  "title": "Response List Parts Api Parts Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/parts/{part_id}": {
+      "get": {
+        "tags": [
+          "parts"
+        ],
+        "summary": "Get Part",
+        "operationId": "get_part_api_parts__part_id__get",
+        "parameters": [
+          {
+            "name": "part_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Part Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PartOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/builds/suggest": {
+      "post": {
+        "tags": [
+          "builds"
+        ],
+        "summary": "Suggest",
+        "operationId": "suggest_api_builds_suggest_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SuggestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuggestResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/builds/validate": {
+      "post": {
+        "tags": [
+          "builds"
+        ],
+        "summary": "Validate",
+        "operationId": "validate_api_builds_validate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ValidateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/prices/corrections": {
+      "post": {
+        "tags": [
+          "prices"
+        ],
+        "summary": "Create Correction",
+        "operationId": "create_correction_api_prices_corrections_post",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CorrectionCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CorrectionOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "prices"
+        ],
+        "summary": "Get Corrections",
+        "operationId": "get_corrections_api_prices_corrections_get",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "X-Admin-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CorrectionOut"
+                  },
+                  "title": "Response Get Corrections Api Prices Corrections Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/prices/corrections/{correction_id}/review": {
+      "post": {
+        "tags": [
+          "prices"
+        ],
+        "summary": "Review",
+        "operationId": "review_api_prices_corrections__correction_id__review_post",
+        "parameters": [
+          {
+            "name": "correction_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Correction Id"
+            }
+          },
+          {
+            "name": "X-Admin-Token",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "X-Admin-Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReviewAction"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CorrectionOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/prices/verified/{part_id}": {
+      "get": {
+        "tags": [
+          "prices"
+        ],
+        "summary": "Get Verified",
+        "operationId": "get_verified_api_prices_verified__part_id__get",
+        "parameters": [
+          {
+            "name": "part_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Part Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifiedPriceOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/prices/history/{part_id}": {
+      "get": {
+        "tags": [
+          "prices"
+        ],
+        "summary": "Get History",
+        "operationId": "get_history_api_prices_history__part_id__get",
+        "parameters": [
+          {
+            "name": "part_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Part Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 200,
+              "minimum": 1,
+              "default": 50,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/prices/{part_id}": {
+      "get": {
+        "tags": [
+          "prices"
+        ],
+        "summary": "Get Part Prices",
+        "operationId": "get_part_prices_api_prices__part_id__get",
+        "parameters": [
+          {
+            "name": "part_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Part Id"
+            }
+          },
+          {
+            "name": "include_live",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": true,
+              "title": "Include Live"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AggregatedPrice"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "system"
+        ],
+        "summary": "Health",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AggregatedPrice": {
+        "properties": {
+          "part_id": {
+            "type": "string",
+            "title": "Part Id"
+          },
+          "part_name": {
+            "type": "string",
+            "title": "Part Name"
+          },
+          "catalog_price": {
+            "type": "number",
+            "title": "Catalog Price"
+          },
+          "verified_price": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verified Price"
+          },
+          "live_best_price": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Live Best Price"
+          },
+          "effective_price": {
+            "type": "number",
+            "title": "Effective Price"
+          },
+          "effective_source": {
+            "type": "string",
+            "title": "Effective Source"
+          },
+          "buy_links": {
+            "items": {
+              "$ref": "#/components/schemas/SearchLink"
+            },
+            "type": "array",
+            "title": "Buy Links"
+          },
+          "live_offers": {
+            "items": {
+              "$ref": "#/components/schemas/LiveOffer"
+            },
+            "type": "array",
+            "title": "Live Offers"
+          },
+          "live_available": {
+            "type": "boolean",
+            "title": "Live Available",
+            "default": false
+          },
+          "live_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Live Error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "part_id",
+          "part_name",
+          "catalog_price",
+          "effective_price",
+          "effective_source",
+          "buy_links"
+        ],
+        "title": "AggregatedPrice"
+      },
+      "BuildPartItem": {
+        "properties": {
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "part": {
+            "$ref": "#/components/schemas/PartOut"
+          },
+          "effective_price": {
+            "type": "number",
+            "title": "Effective Price"
+          },
+          "price_source": {
+            "type": "string",
+            "title": "Price Source"
+          },
+          "buy_links": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Buy Links"
+          },
+          "live_offers": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Live Offers"
+          }
+        },
+        "type": "object",
+        "required": [
+          "category",
+          "part",
+          "effective_price",
+          "price_source"
+        ],
+        "title": "BuildPartItem"
+      },
+      "CompatIssue": {
+        "properties": {
+          "severity": {
+            "type": "string",
+            "enum": [
+              "error",
+              "warning",
+              "info"
+            ],
+            "title": "Severity"
+          },
+          "code": {
+            "type": "string",
+            "title": "Code"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "severity",
+          "code",
+          "message"
+        ],
+        "title": "CompatIssue"
+      },
+      "CorrectionCreate": {
+        "properties": {
+          "part_id": {
+            "type": "string",
+            "title": "Part Id"
+          },
+          "price": {
+            "type": "number",
+            "exclusiveMinimum": 0.0,
+            "title": "Price"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency",
+            "default": "CNY"
+          },
+          "source_platform": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Platform"
+          },
+          "product_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product Url"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "submitter": {
+            "type": "string",
+            "title": "Submitter",
+            "default": "anonymous"
+          },
+          "force_review": {
+            "type": "boolean",
+            "title": "Force Review",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "part_id",
+          "price"
+        ],
+        "title": "CorrectionCreate"
+      },
+      "CorrectionOut": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "part_id": {
+            "type": "string",
+            "title": "Part Id"
+          },
+          "price": {
+            "type": "number",
+            "title": "Price"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "source_platform": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Platform"
+          },
+          "product_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product Url"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "submitter": {
+            "type": "string",
+            "title": "Submitter"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "reject_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reject Reason"
+          },
+          "needs_manual_review": {
+            "type": "boolean",
+            "title": "Needs Manual Review"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "part_id",
+          "price",
+          "currency",
+          "source_platform",
+          "product_url",
+          "note",
+          "submitter",
+          "status",
+          "reject_reason",
+          "needs_manual_review",
+          "created_at",
+          "reviewed_at"
+        ],
+        "title": "CorrectionOut"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HealthOut": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "serpapi_configured": {
+            "type": "boolean",
+            "title": "Serpapi Configured"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "version",
+          "serpapi_configured"
+        ],
+        "title": "HealthOut"
+      },
+      "LiveOffer": {
+        "properties": {
+          "platform": {
+            "type": "string",
+            "title": "Platform"
+          },
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "price": {
+            "type": "number",
+            "title": "Price"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency",
+            "default": "CNY"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          },
+          "fetched_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Fetched At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "platform",
+          "title",
+          "price",
+          "url",
+          "fetched_at"
+        ],
+        "title": "LiveOffer"
+      },
+      "PartOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "title": "Id"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "brand": {
+            "type": "string",
+            "title": "Brand"
+          },
+          "list_price": {
+            "type": "number",
+            "title": "List Price"
+          },
+          "search_keywords": {
+            "type": "string",
+            "title": "Search Keywords"
+          },
+          "specs": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Specs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "category",
+          "name",
+          "brand",
+          "list_price",
+          "search_keywords"
+        ],
+        "title": "PartOut"
+      },
+      "ReviewAction": {
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "verify",
+              "reject"
+            ],
+            "title": "Action"
+          },
+          "reject_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reject Reason"
+          }
+        },
+        "type": "object",
+        "required": [
+          "action"
+        ],
+        "title": "ReviewAction"
+      },
+      "SearchLink": {
+        "properties": {
+          "platform": {
+            "type": "string",
+            "title": "Platform"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "platform",
+          "label",
+          "url"
+        ],
+        "title": "SearchLink"
+      },
+      "SuggestRequest": {
+        "properties": {
+          "budget": {
+            "type": "number",
+            "maximum": 100000.0,
+            "minimum": 2000.0,
+            "title": "Budget",
+            "description": "总预算（元）"
+          },
+          "use_case": {
+            "type": "string",
+            "enum": [
+              "office",
+              "gaming_2k",
+              "content"
+            ],
+            "title": "Use Case",
+            "default": "gaming_2k"
+          },
+          "resolution": {
+            "type": "string",
+            "enum": [
+              "1080p",
+              "1440p",
+              "4k"
+            ],
+            "title": "Resolution",
+            "default": "1440p"
+          },
+          "lock_gpu_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lock Gpu Id"
+          },
+          "include_live_prices": {
+            "type": "boolean",
+            "title": "Include Live Prices",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "budget"
+        ],
+        "title": "SuggestRequest"
+      },
+      "SuggestResponse": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/BuildPartItem"
+            },
+            "type": "array",
+            "title": "Items"
+          },
+          "total_catalog": {
+            "type": "number",
+            "title": "Total Catalog"
+          },
+          "total_effective": {
+            "type": "number",
+            "title": "Total Effective"
+          },
+          "estimated_wattage": {
+            "type": "integer",
+            "title": "Estimated Wattage"
+          },
+          "recommended_psu_wattage": {
+            "type": "integer",
+            "title": "Recommended Psu Wattage"
+          },
+          "issues": {
+            "items": {
+              "$ref": "#/components/schemas/CompatIssue"
+            },
+            "type": "array",
+            "title": "Issues"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Notes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "items",
+          "total_catalog",
+          "total_effective",
+          "estimated_wattage",
+          "recommended_psu_wattage",
+          "issues"
+        ],
+        "title": "SuggestResponse"
+      },
+      "ValidateRequest": {
+        "properties": {
+          "part_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "minItems": 1,
+            "title": "Part Ids"
+          }
+        },
+        "type": "object",
+        "required": [
+          "part_ids"
+        ],
+        "title": "ValidateRequest"
+      },
+      "ValidateResponse": {
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "title": "Ok"
+          },
+          "issues": {
+            "items": {
+              "$ref": "#/components/schemas/CompatIssue"
+            },
+            "type": "array",
+            "title": "Issues"
+          },
+          "estimated_wattage": {
+            "type": "integer",
+            "title": "Estimated Wattage"
+          },
+          "recommended_psu_wattage": {
+            "type": "integer",
+            "title": "Recommended Psu Wattage"
+          },
+          "parts": {
+            "items": {
+              "$ref": "#/components/schemas/PartOut"
+            },
+            "type": "array",
+            "title": "Parts"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ok",
+          "issues",
+          "estimated_wattage",
+          "recommended_psu_wattage",
+          "parts"
+        ],
+        "title": "ValidateResponse"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "ctx": {
+            "type": "object",
+            "title": "Context"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "VerifiedPriceOut": {
+        "properties": {
+          "part_id": {
+            "type": "string",
+            "title": "Part Id"
+          },
+          "price": {
+            "type": "number",
+            "title": "Price"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "source_platform": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Platform"
+          },
+          "product_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Product Url"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "verified_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Verified At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "part_id",
+          "price",
+          "currency",
+          "source_platform",
+          "product_url",
+          "note",
+          "verified_at",
+          "updated_at"
+        ],
+        "title": "VerifiedPriceOut"
+      }
+    }
+  }
+}
