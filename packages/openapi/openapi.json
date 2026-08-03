@@ -1,9 +1,9 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "PEIZHI 国内装机配智 API",
-    "description": "API-first 装机推荐、兼容校验与多通道价格（目录链接 / SerpApi / 用户纠价权威库）",
-    "version": "0.1.0"
+    "title": "PEIZHI 国内配智 API",
+    "description": "API-first：装机推荐 + 云服务器/VPS 选型；多通道价格与用户纠价权威库",
+    "version": "0.2.0"
   },
   "paths": {
     "/api/parts": {
@@ -516,6 +516,116 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AggregatedPrice"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/servers": {
+      "get": {
+        "tags": [
+          "servers"
+        ],
+        "summary": "List Servers",
+        "operationId": "list_servers_api_servers_get",
+        "parameters": [
+          {
+            "name": "scene",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Scene"
+            }
+          },
+          {
+            "name": "provider",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Provider"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PartOut"
+                  },
+                  "title": "Response List Servers Api Servers Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/servers/suggest": {
+      "post": {
+        "tags": [
+          "servers"
+        ],
+        "summary": "Suggest",
+        "operationId": "suggest_api_servers_suggest_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServerSuggestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerSuggestResponse"
                 }
               }
             }
@@ -1058,6 +1168,192 @@
           "url"
         ],
         "title": "SearchLink"
+      },
+      "ServerOfferItem": {
+        "properties": {
+          "rank": {
+            "type": "integer",
+            "title": "Rank"
+          },
+          "score": {
+            "type": "number",
+            "title": "Score"
+          },
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Reasons"
+          },
+          "part": {
+            "$ref": "#/components/schemas/PartOut"
+          },
+          "effective_price": {
+            "type": "number",
+            "title": "Effective Price"
+          },
+          "price_source": {
+            "type": "string",
+            "title": "Price Source"
+          },
+          "price_unit": {
+            "type": "string",
+            "title": "Price Unit",
+            "default": "CNY/月"
+          },
+          "buy_links": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Buy Links"
+          },
+          "live_offers": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Live Offers"
+          }
+        },
+        "type": "object",
+        "required": [
+          "rank",
+          "score",
+          "part",
+          "effective_price",
+          "price_source"
+        ],
+        "title": "ServerOfferItem"
+      },
+      "ServerSuggestRequest": {
+        "properties": {
+          "monthly_budget": {
+            "type": "number",
+            "maximum": 20000.0,
+            "minimum": 10.0,
+            "title": "Monthly Budget",
+            "description": "月预算（元）"
+          },
+          "scene": {
+            "type": "string",
+            "enum": [
+              "website",
+              "app",
+              "database",
+              "ai",
+              "overseas",
+              "dev",
+              "budget"
+            ],
+            "title": "Scene",
+            "default": "website"
+          },
+          "region_pref": {
+            "type": "string",
+            "enum": [
+              "any",
+              "domestic",
+              "overseas"
+            ],
+            "title": "Region Pref",
+            "default": "any"
+          },
+          "min_vcpu": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Vcpu"
+          },
+          "min_memory_gb": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Memory Gb"
+          },
+          "providers": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Providers"
+          },
+          "limit": {
+            "type": "integer",
+            "maximum": 20.0,
+            "minimum": 1.0,
+            "title": "Limit",
+            "default": 5
+          },
+          "include_live_prices": {
+            "type": "boolean",
+            "title": "Include Live Prices",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "monthly_budget"
+        ],
+        "title": "ServerSuggestRequest"
+      },
+      "ServerSuggestResponse": {
+        "properties": {
+          "primary": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ServerOfferItem"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "alternatives": {
+            "items": {
+              "$ref": "#/components/schemas/ServerOfferItem"
+            },
+            "type": "array",
+            "title": "Alternatives"
+          },
+          "issues": {
+            "items": {
+              "$ref": "#/components/schemas/CompatIssue"
+            },
+            "type": "array",
+            "title": "Issues"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Notes"
+          }
+        },
+        "type": "object",
+        "title": "ServerSuggestResponse"
       },
       "SuggestRequest": {
         "properties": {

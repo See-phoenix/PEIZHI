@@ -4,9 +4,11 @@ from typing import Any, Literal, Optional
 from pydantic import BaseModel, Field
 
 
-Category = Literal["cpu", "motherboard", "gpu", "memory", "storage", "psu", "cooler", "case"]
+Category = Literal["cpu", "motherboard", "gpu", "memory", "storage", "psu", "cooler", "case", "server"]
 UseCase = Literal["office", "gaming_2k", "content"]
 Resolution = Literal["1080p", "1440p", "4k"]
+ServerScene = Literal["website", "app", "database", "ai", "overseas", "dev", "budget"]
+RegionPref = Literal["any", "domestic", "overseas"]
 
 
 class PartOut(BaseModel):
@@ -146,3 +148,33 @@ class HealthOut(BaseModel):
     status: str
     version: str
     serpapi_configured: bool
+
+
+class ServerSuggestRequest(BaseModel):
+    monthly_budget: float = Field(ge=10, le=20000, description="月预算（元）")
+    scene: ServerScene = "website"
+    region_pref: RegionPref = "any"
+    min_vcpu: Optional[int] = Field(default=None, ge=1)
+    min_memory_gb: Optional[int] = Field(default=None, ge=1)
+    providers: Optional[list[str]] = None
+    limit: int = Field(default=5, ge=1, le=20)
+    include_live_prices: bool = False
+
+
+class ServerOfferItem(BaseModel):
+    rank: int
+    score: float
+    reasons: list[str] = Field(default_factory=list)
+    part: PartOut
+    effective_price: float
+    price_source: str
+    price_unit: str = "CNY/月"
+    buy_links: dict[str, str] = Field(default_factory=dict)
+    live_offers: list[dict[str, Any]] = Field(default_factory=list)
+
+
+class ServerSuggestResponse(BaseModel):
+    primary: Optional[ServerOfferItem] = None
+    alternatives: list[ServerOfferItem] = Field(default_factory=list)
+    issues: list[CompatIssue] = Field(default_factory=list)
+    notes: list[str] = Field(default_factory=list)

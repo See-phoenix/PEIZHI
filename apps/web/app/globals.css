@@ -39,6 +39,46 @@ a:hover {
   text-decoration: underline;
 }
 
+.topnav {
+  border-bottom: 1px solid var(--border);
+  background: rgba(15, 20, 25, 0.72);
+  backdrop-filter: blur(10px);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.topnav-inner {
+  width: min(1100px, calc(100% - 2rem));
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 0;
+}
+
+.topnav .brand {
+  color: var(--text);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+}
+
+.topnav nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.topnav nav a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.topnav nav a:hover {
+  color: var(--text);
+}
+
 main {
   width: min(1100px, calc(100% - 2rem));
   margin: 0 auto;

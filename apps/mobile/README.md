@@ -17,9 +17,10 @@
 
 | 方法 | 路径 | 用途 |
 |------|------|------|
-| POST | `/api/builds/suggest` | 生成配置 |
+| POST | `/api/builds/suggest` | 装机配置 |
+| POST | `/api/servers/suggest` | 服务器/VPS 选型 |
 | GET | `/api/prices/{part_id}` | 多通道价格 |
 | POST | `/api/prices/corrections` | 用户纠价 |
 | GET | `/api/prices/verified/{part_id}` | 权威价 |
 
-纠价通过校验后进入 `verified_prices`，各端读取同一权威价源。
+纠价通过校验后进入 `verified_prices`，装机配件与服务器套餐共用同一权威价源。

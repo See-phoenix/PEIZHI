@@ -8,14 +8,14 @@ from sqlalchemy.orm import Session
 from app.models import Part
 
 
-SEED_PATH = Path(__file__).resolve().parents[1] / "data" / "parts_seed.json"
+DATA_DIR = Path(__file__).resolve().parents[1] / "data"
+SEED_FILES = [
+    DATA_DIR / "parts_seed.json",
+    DATA_DIR / "servers_seed.json",
+]
 
 
-def seed_parts(db: Session, force: bool = False) -> int:
-    if not force and db.query(Part).count() > 0:
-        return 0
-
-    raw = json.loads(SEED_PATH.read_text(encoding="utf-8"))
+def _upsert_items(db: Session, raw: list[dict]) -> int:
     count = 0
     for item in raw:
         existing = db.get(Part, item["id"])
@@ -39,5 +39,30 @@ def seed_parts(db: Session, force: bool = False) -> int:
                 )
             )
             count += 1
-    db.commit()
     return count
+
+
+def seed_parts(db: Session, force: bool = False) -> int:
+    """Seed PC parts + server plans. force=True refreshes all known seed IDs."""
+    if not force and db.query(Part).count() > 0:
+        # Still merge newly added seed IDs (e.g. servers added later)
+        inserted = 0
+        for path in SEED_FILES:
+            if not path.exists():
+                continue
+            raw = json.loads(path.read_text(encoding="utf-8"))
+            for item in raw:
+                if db.get(Part, item["id"]) is None:
+                    inserted += _upsert_items(db, [item])
+        if inserted:
+            db.commit()
+        return inserted
+
+    inserted = 0
+    for path in SEED_FILES:
+        if not path.exists():
+            continue
+        raw = json.loads(path.read_text(encoding="utf-8"))
+        inserted += _upsert_items(db, raw)
+    db.commit()
+    return inserted

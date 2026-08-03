@@ -1,16 +1,26 @@
-# PEIZHI 国内装机配智
+# PEIZHI 国内配智
 
-API 优先的国内 DIY 装机推荐与选购系统：规则引擎配单 + 兼容校验，价格层同时支持 **A 目录参考价/电商搜索跳转** 与 **B SerpApi 购物实时价**，并支持 **用户纠价 → 系统校验 → 权威价入库**，供 Web / 手机 / 客户端共用。
+API 优先的国内 **装机推荐** + **云服务器/VPS 选型** 系统：规则引擎配单/选型，价格层支持 **A 目录参考价/购买跳转**、**B SerpApi 实时搜索价**，以及 **用户纠价 → 系统校验 → 权威价入库**，供 Web / 手机 / 客户端共用。
+
+## 能力一览
+
+| 模块 | 说明 | 借鉴来源 |
+|------|------|----------|
+| 装机配智 | 预算+用途 → 兼容配置单 | Gestalt / pc-builder / Build Buddy |
+| 服务器选型 | 场景+月预算+规格过滤 → 主推/备选套餐 | EC2 Instance Selector、VPS 场景矩阵、云比价站 |
+| 价格权威库 | 纠价入库，装机与服务器共用 | Scrabby 历史价思路 |
 
 ## 目录
 
 ```text
 PEIZHI/
-  backend/           FastAPI + SQLite
-  apps/web/          Next.js Web（首期）
-  apps/mobile/       手机端接入说明（二期）
-  apps/desktop/      桌面端接入说明（二期）
-  packages/openapi/  OpenAPI 契约
+  backend/                 FastAPI + SQLite
+    data/parts_seed.json   DIY 配件
+    data/servers_seed.json 云主机/VPS 套餐
+  apps/web/                Next.js（/ 装机，/servers 服务器）
+  apps/mobile/             二期说明
+  apps/desktop/            二期说明
+  packages/openapi/        OpenAPI 契约
 ```
 
 ## 快速启动
@@ -20,12 +30,14 @@ PEIZHI/
 ```bash
 cd backend
 python -m pip install -r requirements.txt
-copy .env.example .env   # Windows；按需填写 SERPAPI_API_KEY
+copy .env.example .env
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 - API 文档：http://127.0.0.1:8000/docs
 - 健康检查：http://127.0.0.1:8000/health
+
+若本地已有旧 `peizhi.db`，重启后会自动合并新增的 server 种子 ID。
 
 ### 2. Web
 
@@ -35,9 +47,10 @@ npm install
 npm run dev
 ```
 
-打开 http://127.0.0.1:3000
+- 装机：http://127.0.0.1:3000
+- 服务器：http://127.0.0.1:3000/servers
 
-### 3. 导出 OpenAPI（多端）
+### 3. 导出 OpenAPI
 
 ```bash
 cd backend
@@ -48,36 +61,47 @@ python scripts/export_openapi.py
 
 | 变量 | 说明 | 默认 |
 |------|------|------|
-| `ADMIN_TOKEN` | 纠价审核管理员 Token（请求头 `X-Admin-Token`） | `peizhi-admin-dev` |
-| `SERPAPI_API_KEY` | B 通道实时购物搜索；为空则仅 A 通道 | 空 |
-| `PRICE_AUTO_VERIFY_THRESHOLD` | 相对参考价偏差在此内自动入库（0.4=±40%） | `0.40` |
+| `ADMIN_TOKEN` | 纠价审核 Token（`X-Admin-Token`） | `peizhi-admin-dev` |
+| `SERPAPI_API_KEY` | B 通道实时搜索；空则仅 A | 空 |
+| `PRICE_AUTO_VERIFY_THRESHOLD` | 自动入库偏差阈值 | `0.40` |
 | `DATABASE_URL` | 数据库 | `sqlite:///./peizhi.db` |
-| `CORS_ORIGINS` | 允许的前端源 | `http://localhost:3000,...` |
+| `CORS_ORIGINS` | 前端源 | `http://localhost:3000,...` |
 
 ## 价格优先级
 
-1. **权威价**（用户纠价且校验通过）
+1. **权威价**（纠价校验通过）
 2. **实时搜索价**（SerpApi，可选）
-3. **目录参考价** + 京东 / 天猫 / 拼多多搜索链接
-
-纠价规则摘要：
-
-- 价格 ≤0 拒绝
-- 相对目录价低于 0.2 倍或高于 3 倍：自动拒绝
-- 偏差超过阈值：进入 `pending`，需管理员 `verify`
-- 通过后写入 `verified_prices` + `price_history`
+3. **目录参考价** + 官网/电商搜索链接（服务器含官网 `official`）
 
 ## 核心 API
 
 | 方法 | 路径 | 说明 |
 |------|------|------|
 | GET | `/api/parts` | 配件列表 |
-| POST | `/api/builds/suggest` | 推荐配置 |
-| POST | `/api/builds/validate` | 校验配置 |
-| GET | `/api/prices/{part_id}` | 聚合价格 |
+| POST | `/api/builds/suggest` | 装机推荐 |
+| POST | `/api/builds/validate` | 装机校验 |
+| GET | `/api/servers` | 服务器套餐列表 |
+| POST | `/api/servers/suggest` | 服务器选型 |
+| GET | `/api/prices/{part_id}` | 聚合价格（配件与服务器共用） |
 | POST | `/api/prices/corrections` | 提交纠价 |
-| GET | `/api/prices/verified/{part_id}` | 读取权威价 |
+| GET | `/api/prices/verified/{part_id}` | 权威价 |
 | POST | `/api/prices/corrections/{id}/review` | 管理员审核 |
+
+### 服务器选型请求示例
+
+```json
+{
+  "monthly_budget": 100,
+  "scene": "website",
+  "region_pref": "domestic",
+  "min_vcpu": 2,
+  "min_memory_gb": 2,
+  "include_live_prices": false,
+  "limit": 5
+}
+```
+
+`scene`：`website` | `app` | `database` | `ai` | `overseas` | `dev` | `budget`
 
 ## 测试
 
@@ -86,13 +110,6 @@ cd backend
 python -m pytest tests/ -q
 ```
 
-## 设计来源（思路复用）
-
-- Gestalt：价格可插拔与降级
-- pc-builder：suggest / validate API
-- Build Buddy：多维兼容校验
-- MetaBuild / 区域比价站：区域购买链接与多商家价
-
 ## License
 
-MIT（练习项目，可自由修改）
+MIT

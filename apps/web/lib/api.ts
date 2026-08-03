@@ -1,5 +1,7 @@
 export type UseCase = "office" | "gaming_2k" | "content";
 export type Resolution = "1080p" | "1440p" | "4k";
+export type ServerScene = "website" | "app" | "database" | "ai" | "overseas" | "dev" | "budget";
+export type RegionPref = "any" | "domestic" | "overseas";
 
 export interface Part {
   id: string;
@@ -32,6 +34,25 @@ export interface SuggestResponse {
   total_effective: number;
   estimated_wattage: number;
   recommended_psu_wattage: number;
+  issues: CompatIssue[];
+  notes: string[];
+}
+
+export interface ServerOfferItem {
+  rank: number;
+  score: number;
+  reasons: string[];
+  part: Part;
+  effective_price: number;
+  price_source: string;
+  price_unit: string;
+  buy_links: Record<string, string>;
+  live_offers: Array<Record<string, unknown>>;
+}
+
+export interface ServerSuggestResponse {
+  primary: ServerOfferItem | null;
+  alternatives: ServerOfferItem[];
   issues: CompatIssue[];
   notes: string[];
 }
@@ -96,6 +117,21 @@ export function suggestBuild(body: {
   include_live_prices: boolean;
 }) {
   return request<SuggestResponse>("/api/builds/suggest", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+export function suggestServers(body: {
+  monthly_budget: number;
+  scene: ServerScene;
+  region_pref: RegionPref;
+  min_vcpu?: number | null;
+  min_memory_gb?: number | null;
+  limit?: number;
+  include_live_prices: boolean;
+}) {
+  return request<ServerSuggestResponse>("/api/servers/suggest", {
     method: "POST",
     body: JSON.stringify(body),
   });

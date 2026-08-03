@@ -105,3 +105,48 @@ def test_price_correction_reject_outlier(client):
     )
     assert r.status_code == 200
     assert r.json()["status"] == "rejected"
+
+
+def test_list_servers(client):
+    r = client.get("/api/servers")
+    assert r.status_code == 200
+    rows = r.json()
+    assert len(rows) >= 5
+    assert all(p["category"] == "server" for p in rows)
+
+
+def test_suggest_servers_website_domestic(client):
+    r = client.post(
+        "/api/servers/suggest",
+        json={
+            "monthly_budget": 100,
+            "scene": "website",
+            "region_pref": "domestic",
+            "include_live_prices": False,
+            "limit": 5,
+        },
+    )
+    assert r.status_code == 200
+    data = r.json()
+    assert data["primary"] is not None
+    assert data["primary"]["part"]["category"] == "server"
+    assert data["primary"]["effective_price"] <= 100 * 1.05
+    provider = data["primary"]["part"]["specs"]["provider"]
+    assert provider in {"aliyun", "tencent", "huawei"}
+    assert "official" in data["primary"]["buy_links"]
+
+
+def test_suggest_servers_ai_warns_without_gpu_budget(client):
+    r = client.post(
+        "/api/servers/suggest",
+        json={
+            "monthly_budget": 300,
+            "scene": "ai",
+            "region_pref": "domestic",
+            "include_live_prices": False,
+        },
+    )
+    assert r.status_code == 200
+    data = r.json()
+    # low budget AI may match CPU CVM and warn
+    assert data["primary"] is not None or any(i["code"] == "no_server_match" for i in data["issues"])
