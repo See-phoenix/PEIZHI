@@ -113,6 +113,7 @@ export function suggestBuild(body: {
   budget: number;
   use_case: UseCase;
   resolution: Resolution;
+  locks?: Record<string, string>;
   lock_gpu_id?: string | null;
   include_live_prices: boolean;
 }) {

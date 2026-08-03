@@ -1,0 +1,218 @@
+[
+  {
+    "id": "gpu-rx-9060xt-8g",
+    "category": "gpu",
+    "name": "蓝宝石 RX 9060 XT 8G 极地",
+    "brand": "蓝宝石",
+    "list_price": 2199,
+    "search_keywords": "RX 9060 XT 8G",
+    "specs": { "vram_gb": 8, "tdp": 150, "length_mm": 270, "power_connectors": "1x8pin", "tier": 1, "chip": "RX 9060 XT" }
+  },
+  {
+    "id": "gpu-rx-9060xt-16g",
+    "category": "gpu",
+    "name": "蓝宝石 RX 9060 XT 16G 极地",
+    "brand": "蓝宝石",
+    "list_price": 2699,
+    "search_keywords": "RX 9060 XT 16G",
+    "specs": { "vram_gb": 16, "tdp": 160, "length_mm": 280, "power_connectors": "1x8pin", "tier": 1, "chip": "RX 9060 XT" }
+  },
+  {
+    "id": "gpu-rx-9070-gre",
+    "category": "gpu",
+    "name": "蓝宝石 RX 9070 GRE 12G",
+    "brand": "蓝宝石",
+    "list_price": 3199,
+    "search_keywords": "RX 9070 GRE 12G",
+    "specs": { "vram_gb": 12, "tdp": 220, "length_mm": 320, "power_connectors": "2x8pin", "tier": 2, "chip": "RX 9070 GRE" }
+  },
+  {
+    "id": "gpu-rx-9070-gre-xfx",
+    "category": "gpu",
+    "name": "讯景 RX 9070 GRE 12G 黑狼",
+    "brand": "讯景",
+    "list_price": 3299,
+    "search_keywords": "讯景 RX 9070 GRE",
+    "specs": { "vram_gb": 12, "tdp": 220, "length_mm": 325, "power_connectors": "2x8pin", "tier": 2, "chip": "RX 9070 GRE" }
+  },
+  {
+    "id": "gpu-rx-9070-gre-pc",
+    "category": "gpu",
+    "name": "撼讯 RX 9070 GRE 12G 游荡者",
+    "brand": "撼讯",
+    "list_price": 3099,
+    "search_keywords": "撼讯 RX 9070 GRE",
+    "specs": { "vram_gb": 12, "tdp": 220, "length_mm": 304, "power_connectors": "2x8pin", "tier": 2, "chip": "RX 9070 GRE" }
+  },
+  {
+    "id": "gpu-rx-9070",
+    "category": "gpu",
+    "name": "讯景 RX 9070 16G",
+    "brand": "讯景",
+    "list_price": 4299,
+    "search_keywords": "RX 9070 16G",
+    "specs": { "vram_gb": 16, "tdp": 220, "length_mm": 330, "power_connectors": "2x8pin", "tier": 3, "chip": "RX 9070" }
+  },
+  {
+    "id": "gpu-rx-9070-sapphire",
+    "category": "gpu",
+    "name": "蓝宝石 RX 9070 16G 超白金",
+    "brand": "蓝宝石",
+    "list_price": 4399,
+    "search_keywords": "蓝宝石 RX 9070 16G",
+    "specs": { "vram_gb": 16, "tdp": 220, "length_mm": 320, "power_connectors": "2x8pin", "tier": 3, "chip": "RX 9070" }
+  },
+  {
+    "id": "gpu-rx-9070xt",
+    "category": "gpu",
+    "name": "蓝宝石 RX 9070 XT 16G 超白金",
+    "brand": "蓝宝石",
+    "list_price": 5299,
+    "search_keywords": "RX 9070 XT 16G",
+    "specs": { "vram_gb": 16, "tdp": 304, "length_mm": 320, "power_connectors": "2x8pin", "tier": 4, "chip": "RX 9070 XT" }
+  },
+  {
+    "id": "gpu-rx-9070xt-xfx",
+    "category": "gpu",
+    "name": "讯景 RX 9070 XT 16G 黑狼",
+    "brand": "讯景",
+    "list_price": 5199,
+    "search_keywords": "讯景 RX 9070 XT",
+    "specs": { "vram_gb": 16, "tdp": 304, "length_mm": 340, "power_connectors": "2x8pin", "tier": 4, "chip": "RX 9070 XT" }
+  },
+  {
+    "id": "gpu-rx-9070xt-asus",
+    "category": "gpu",
+    "name": "华硕 TUF RX 9070 XT 16G",
+    "brand": "华硕",
+    "list_price": 5499,
+    "search_keywords": "华硕 TUF RX 9070 XT",
+    "specs": { "vram_gb": 16, "tdp": 304, "length_mm": 350, "power_connectors": "2x8pin", "tier": 4, "chip": "RX 9070 XT" }
+  },
+  {
+    "id": "gpu-rtx-5050",
+    "category": "gpu",
+    "name": "七彩虹 RTX 5050 战斧 8G",
+    "brand": "七彩虹",
+    "list_price": 1899,
+    "search_keywords": "RTX 5050 8G",
+    "specs": { "vram_gb": 8, "tdp": 130, "length_mm": 250, "power_connectors": "1x8pin", "tier": 1, "chip": "RTX 5050" }
+  },
+  {
+    "id": "gpu-rtx-5060",
+    "category": "gpu",
+    "name": "七彩虹 RTX 5060 战斧 8G",
+    "brand": "七彩虹",
+    "list_price": 2499,
+    "search_keywords": "RTX 5060 8G",
+    "specs": { "vram_gb": 8, "tdp": 145, "length_mm": 270, "power_connectors": "1x8pin", "tier": 1, "chip": "RTX 5060" }
+  },
+  {
+    "id": "gpu-rtx-5060-msi",
+    "category": "gpu",
+    "name": "微星 RTX 5060 万图师 8G",
+    "brand": "微星",
+    "list_price": 2599,
+    "search_keywords": "微星 RTX 5060",
+    "specs": { "vram_gb": 8, "tdp": 145, "length_mm": 280, "power_connectors": "1x8pin", "tier": 1, "chip": "RTX 5060" }
+  },
+  {
+    "id": "gpu-rtx-5060ti-8g",
+    "category": "gpu",
+    "name": "七彩虹 RTX 5060 Ti 8G 战斧",
+    "brand": "七彩虹",
+    "list_price": 2999,
+    "search_keywords": "RTX 5060 Ti 8G",
+    "specs": { "vram_gb": 8, "tdp": 180, "length_mm": 290, "power_connectors": "1x8pin", "tier": 2, "chip": "RTX 5060 Ti" }
+  },
+  {
+    "id": "gpu-rtx-5060ti",
+    "category": "gpu",
+    "name": "七彩虹 RTX 5060 Ti 16G 战斧",
+    "brand": "七彩虹",
+    "list_price": 3599,
+    "search_keywords": "RTX 5060 Ti 16G",
+    "specs": { "vram_gb": 16, "tdp": 180, "length_mm": 305, "power_connectors": "1x8pin", "tier": 2, "chip": "RTX 5060 Ti" }
+  },
+  {
+    "id": "gpu-rtx-5060ti-gigabyte",
+    "category": "gpu",
+    "name": "技嘉 RTX 5060 Ti 16G 魔鹰",
+    "brand": "技嘉",
+    "list_price": 3699,
+    "search_keywords": "技嘉 RTX 5060 Ti 16G",
+    "specs": { "vram_gb": 16, "tdp": 180, "length_mm": 310, "power_connectors": "1x8pin", "tier": 2, "chip": "RTX 5060 Ti" }
+  },
+  {
+    "id": "gpu-rtx-5070",
+    "category": "gpu",
+    "name": "七彩虹 RTX 5070 Advanced 12G",
+    "brand": "七彩虹",
+    "list_price": 4499,
+    "search_keywords": "RTX 5070 12G",
+    "specs": { "vram_gb": 12, "tdp": 250, "length_mm": 320, "power_connectors": "1x16pin", "tier": 3, "chip": "RTX 5070" }
+  },
+  {
+    "id": "gpu-rtx-5070-asus",
+    "category": "gpu",
+    "name": "华硕 TUF RTX 5070 12G",
+    "brand": "华硕",
+    "list_price": 4699,
+    "search_keywords": "华硕 TUF RTX 5070",
+    "specs": { "vram_gb": 12, "tdp": 250, "length_mm": 335, "power_connectors": "1x16pin", "tier": 3, "chip": "RTX 5070" }
+  },
+  {
+    "id": "gpu-rtx-5070ti",
+    "category": "gpu",
+    "name": "七彩虹 RTX 5070 Ti Advanced OC 16G",
+    "brand": "七彩虹",
+    "list_price": 5999,
+    "search_keywords": "RTX 5070 Ti 16G",
+    "specs": { "vram_gb": 16, "tdp": 300, "length_mm": 330, "power_connectors": "1x16pin", "tier": 4, "chip": "RTX 5070 Ti" }
+  },
+  {
+    "id": "gpu-rtx-5070ti-msi",
+    "category": "gpu",
+    "name": "微星 RTX 5070 Ti 超龙 16G",
+    "brand": "微星",
+    "list_price": 6199,
+    "search_keywords": "微星 RTX 5070 Ti",
+    "specs": { "vram_gb": 16, "tdp": 300, "length_mm": 340, "power_connectors": "1x16pin", "tier": 4, "chip": "RTX 5070 Ti" }
+  },
+  {
+    "id": "gpu-rtx-5080",
+    "category": "gpu",
+    "name": "七彩虹 RTX 5080 Advanced OC 16G",
+    "brand": "七彩虹",
+    "list_price": 8999,
+    "search_keywords": "RTX 5080 16G",
+    "specs": { "vram_gb": 16, "tdp": 360, "length_mm": 336, "power_connectors": "1x16pin", "tier": 5, "chip": "RTX 5080" }
+  },
+  {
+    "id": "gpu-rtx-5080-asus",
+    "category": "gpu",
+    "name": "华硕 ROG RTX 5080 16G",
+    "brand": "华硕",
+    "list_price": 9999,
+    "search_keywords": "华硕 ROG RTX 5080",
+    "specs": { "vram_gb": 16, "tdp": 360, "length_mm": 358, "power_connectors": "1x16pin", "tier": 5, "chip": "RTX 5080" }
+  },
+  {
+    "id": "gpu-rtx-5090d",
+    "category": "gpu",
+    "name": "七彩虹 RTX 5090D Advanced OC 32G",
+    "brand": "七彩虹",
+    "list_price": 16999,
+    "search_keywords": "RTX 5090D 32G",
+    "specs": { "vram_gb": 32, "tdp": 575, "length_mm": 360, "power_connectors": "1x16pin", "tier": 6, "chip": "RTX 5090D" }
+  },
+  {
+    "id": "gpu-rtx-5090d-asus",
+    "category": "gpu",
+    "name": "华硕 ROG RTX 5090D 32G",
+    "brand": "华硕",
+    "list_price": 18999,
+    "search_keywords": "华硕 ROG RTX 5090D",
+    "specs": { "vram_gb": 32, "tdp": 575, "length_mm": 380, "power_connectors": "1x16pin", "tier": 6, "chip": "RTX 5090D" }
+  }
+]

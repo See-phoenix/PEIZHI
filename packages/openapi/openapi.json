@@ -1384,6 +1384,14 @@
             "title": "Resolution",
             "default": "1440p"
           },
+          "locks": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "Locks",
+            "description": "自选配件：类别->配件ID，如 {\"gpu\":\"gpu-rx-9070-gre\",\"cpu\":\"cpu-r5-9600x\"}"
+          },
           "lock_gpu_id": {
             "anyOf": [
               {
@@ -1393,7 +1401,8 @@
                 "type": "null"
               }
             ],
-            "title": "Lock Gpu Id"
+            "title": "Lock Gpu Id",
+            "description": "兼容旧字段，等价于 locks.gpu"
           },
           "include_live_prices": {
             "type": "boolean",

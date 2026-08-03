@@ -21,7 +21,7 @@ def test_suggest_with_locked_gpu(client):
             "budget": 9000,
             "use_case": "gaming_2k",
             "resolution": "1440p",
-            "lock_gpu_id": "gpu-rx-9070-gre",
+            "locks": {"gpu": "gpu-rx-9070-gre"},
             "include_live_prices": False,
         },
     )
@@ -31,6 +31,37 @@ def test_suggest_with_locked_gpu(client):
     gpu = next(i for i in data["items"] if i["category"] == "gpu")
     assert gpu["part"]["id"] == "gpu-rx-9070-gre"
     assert not any(i["severity"] == "error" for i in data["issues"])
+
+
+def test_gpu_catalog_expanded(client):
+    r = client.get("/api/parts?category=gpu")
+    assert r.status_code == 200
+    gpus = r.json()
+    assert len(gpus) >= 20
+
+
+def test_suggest_with_multi_locks(client):
+    r = client.post(
+        "/api/builds/suggest",
+        json={
+            "budget": 12000,
+            "use_case": "gaming_2k",
+            "resolution": "1440p",
+            "locks": {
+                "cpu": "cpu-r7-9800x3d",
+                "gpu": "gpu-rtx-5070",
+                "memory": "ram-32g-6000",
+            },
+            "include_live_prices": False,
+        },
+    )
+    assert r.status_code == 200
+    data = r.json()
+    by_cat = {i["category"]: i["part"]["id"] for i in data["items"]}
+    assert by_cat["cpu"] == "cpu-r7-9800x3d"
+    assert by_cat["gpu"] == "gpu-rtx-5070"
+    assert by_cat["memory"] == "ram-32g-6000"
+    assert any("已自选" in n for n in data["notes"])
 
 
 def test_validate_socket_mismatch(client):

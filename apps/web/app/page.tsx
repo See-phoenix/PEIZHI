@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import {
   API_BASE,
   Part,
@@ -23,19 +23,23 @@ const CATEGORY_LABEL: Record<string, string> = {
   case: "机箱",
 };
 
+const LOCKABLE = ["gpu", "cpu", "motherboard", "memory", "storage", "cooler", "psu", "case"] as const;
+
 const SOURCE_LABEL: Record<string, string> = {
   verified: "权威价",
   live: "实时搜索",
   catalog: "目录参考价",
 };
 
+type Locks = Record<string, string>;
+
 export default function HomePage() {
   const [budget, setBudget] = useState(9000);
   const [useCase, setUseCase] = useState<UseCase>("gaming_2k");
   const [resolution, setResolution] = useState<Resolution>("1440p");
-  const [lockGpu, setLockGpu] = useState("gpu-rx-9070-gre");
+  const [locks, setLocks] = useState<Locks>({ gpu: "gpu-rx-9070-gre" });
   const [includeLive, setIncludeLive] = useState(false);
-  const [gpus, setGpus] = useState<Part[]>([]);
+  const [catalog, setCatalog] = useState<Part[]>([]);
   const [result, setResult] = useState<SuggestResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,10 +52,42 @@ export default function HomePage() {
   const [correctNote, setCorrectNote] = useState("");
 
   useEffect(() => {
-    listParts("gpu")
-      .then(setGpus)
-      .catch(() => setGpus([]));
+    listParts()
+      .then((rows) => setCatalog(rows.filter((p) => p.category !== "server")))
+      .catch(() => setCatalog([]));
   }, []);
+
+  const byCategory = useMemo(() => {
+    const map: Record<string, Part[]> = {};
+    for (const p of catalog) {
+      (map[p.category] ||= []).push(p);
+    }
+    for (const key of Object.keys(map)) {
+      map[key].sort((a, b) => a.list_price - b.list_price);
+    }
+    return map;
+  }, [catalog]);
+
+  const gpuCount = byCategory.gpu?.length || 0;
+
+  function setLock(category: string, partId: string) {
+    setLocks((prev) => {
+      const next = { ...prev };
+      if (!partId) delete next[category];
+      else next[category] = partId;
+      return next;
+    });
+  }
+
+  function buildPayload() {
+    return {
+      budget,
+      use_case: useCase,
+      resolution,
+      locks,
+      include_live_prices: includeLive,
+    };
+  }
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
@@ -59,14 +95,7 @@ export default function HomePage() {
     setError(null);
     setOkMsg(null);
     try {
-      const data = await suggestBuild({
-        budget,
-        use_case: useCase,
-        resolution,
-        lock_gpu_id: lockGpu || null,
-        include_live_prices: includeLive,
-      });
-      setResult(data);
+      setResult(await suggestBuild(buildPayload()));
     } catch (err) {
       setError(err instanceof Error ? err.message : "请求失败");
     } finally {
@@ -89,22 +118,14 @@ export default function HomePage() {
         submitter: "web-user",
       });
       if (out.status === "verified") {
-        setOkMsg(`${correctPart.name} 纠价已校验入库（权威价 ¥${out.price}），可供其他模块调用`);
+        setOkMsg(`${correctPart.name} 纠价已校验入库（权威价 ¥${out.price}）`);
       } else if (out.status === "pending") {
         setOkMsg("纠价已提交，偏离较大需人工审核后再入库");
       } else {
         setOkMsg(`纠价被拒绝：${out.reject_reason || out.status}`);
       }
       setCorrectPart(null);
-      // refresh build without live to pick up verified prices quickly
-      const data = await suggestBuild({
-        budget,
-        use_case: useCase,
-        resolution,
-        lock_gpu_id: lockGpu || null,
-        include_live_prices: includeLive,
-      });
-      setResult(data);
+      setResult(await suggestBuild(buildPayload()));
     } catch (err) {
       setError(err instanceof Error ? err.message : "纠价失败");
     }
@@ -115,8 +136,8 @@ export default function HomePage() {
       <header className="hero">
         <h1>PEIZHI 装机配智</h1>
         <p>
-          按预算与用途生成国内主机配置；价格支持目录参考价 + 购物搜索实时价，并可手动纠价入库。
-          云服务器 / VPS 选型请前往「服务器选型」。
+          按预算与用途生成配置；也可自选 CPU / 显卡 / 主板等任意配件，其余自动补齐并做兼容校验。
+          当前目录含 {gpuCount} 款显卡可选。
         </p>
       </header>
 
@@ -153,18 +174,29 @@ export default function HomePage() {
                 <option value="4k">4K</option>
               </select>
             </label>
-            <label>
-              锁定显卡（可选）
-              <select value={lockGpu} onChange={(e) => setLockGpu(e.target.value)}>
-                <option value="">自动选择</option>
-                {gpus.map((g) => (
-                  <option key={g.id} value={g.id}>
-                    {g.name}（¥{g.list_price}）
-                  </option>
-                ))}
-              </select>
-            </label>
           </div>
+
+          <h3 className="section-title">自选配件（可选，未选则自动匹配）</h3>
+          <div className="grid-form">
+            {LOCKABLE.map((cat) => (
+              <label key={cat}>
+                {CATEGORY_LABEL[cat]}
+                {cat === "gpu" ? `（${gpuCount}）` : ""}
+                <select
+                  value={locks[cat] || ""}
+                  onChange={(e) => setLock(cat, e.target.value)}
+                >
+                  <option value="">自动选择</option>
+                  {(byCategory[cat] || []).map((p) => (
+                    <option key={p.id} value={p.id}>
+                      {p.name}（¥{p.list_price}）
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ))}
+          </div>
+
           <div className="actions">
             <label style={{ flexDirection: "row", alignItems: "center", gap: "0.5rem" }}>
               <input
@@ -174,6 +206,13 @@ export default function HomePage() {
               />
               拉取 SerpApi 实时搜索价（需后端配置 KEY）
             </label>
+            <button
+              type="button"
+              className="secondary"
+              onClick={() => setLocks({})}
+            >
+              清空自选
+            </button>
             <button type="submit" disabled={loading}>
               {loading ? "生成中…" : "生成配置单"}
             </button>
@@ -229,7 +268,14 @@ export default function HomePage() {
               <tbody>
                 {result.items.map((item) => (
                   <tr key={item.part.id}>
-                    <td>{CATEGORY_LABEL[item.category] || item.category}</td>
+                    <td>
+                      {CATEGORY_LABEL[item.category] || item.category}
+                      {locks[item.category] === item.part.id ? (
+                        <span className="badge verified" style={{ marginLeft: 6 }}>
+                          自选
+                        </span>
+                      ) : null}
+                    </td>
                     <td>
                       <div>{item.part.name}</div>
                       <div style={{ color: "var(--muted)", fontSize: "0.8rem" }}>
@@ -294,8 +340,7 @@ export default function HomePage() {
       )}
 
       <p className="footer-note">
-        API：{API_BASE} · OpenAPI 文档见后端 /docs · 权威价入库后可被各端通过{" "}
-        <code>/api/prices/verified/&#123;part_id&#125;</code> 读取
+        API：{API_BASE} · 自选通过 <code>locks</code> 传入 · OpenAPI 见 /docs
       </p>
 
       {correctPart && (

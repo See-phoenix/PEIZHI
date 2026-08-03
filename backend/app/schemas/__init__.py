@@ -27,7 +27,14 @@ class SuggestRequest(BaseModel):
     budget: float = Field(ge=2000, le=100000, description="总预算（元）")
     use_case: UseCase = "gaming_2k"
     resolution: Resolution = "1440p"
-    lock_gpu_id: Optional[str] = None
+    locks: dict[str, str] = Field(
+        default_factory=dict,
+        description="自选配件：类别->配件ID，如 {\"gpu\":\"gpu-rx-9070-gre\",\"cpu\":\"cpu-r5-9600x\"}",
+    )
+    lock_gpu_id: Optional[str] = Field(
+        default=None,
+        description="兼容旧字段，等价于 locks.gpu",
+    )
     include_live_prices: bool = True
 
 

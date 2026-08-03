@@ -11,6 +11,7 @@ from app.models import Part
 DATA_DIR = Path(__file__).resolve().parents[1] / "data"
 SEED_FILES = [
     DATA_DIR / "parts_seed.json",
+    DATA_DIR / "gpus_seed.json",
     DATA_DIR / "servers_seed.json",
 ]
 

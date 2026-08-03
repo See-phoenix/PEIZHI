@@ -112,66 +112,6 @@
     }
   },
   {
-    "id": "gpu-rx-9060xt",
-    "category": "gpu",
-    "name": "蓝宝石 RX 9060 XT 16G",
-    "brand": "蓝宝石",
-    "list_price": 2699,
-    "search_keywords": "RX 9060 XT 16G",
-    "specs": {
-      "vram_gb": 16,
-      "tdp": 160,
-      "length_mm": 280,
-      "power_connectors": "1x8pin",
-      "tier": 1
-    }
-  },
-  {
-    "id": "gpu-rx-9070-gre",
-    "category": "gpu",
-    "name": "蓝宝石 RX 9070 GRE 12G",
-    "brand": "蓝宝石",
-    "list_price": 3199,
-    "search_keywords": "RX 9070 GRE 12G",
-    "specs": {
-      "vram_gb": 12,
-      "tdp": 220,
-      "length_mm": 320,
-      "power_connectors": "2x8pin",
-      "tier": 2
-    }
-  },
-  {
-    "id": "gpu-rx-9070",
-    "category": "gpu",
-    "name": "讯景 RX 9070 16G",
-    "brand": "讯景",
-    "list_price": 4299,
-    "search_keywords": "RX 9070 16G",
-    "specs": {
-      "vram_gb": 16,
-      "tdp": 220,
-      "length_mm": 330,
-      "power_connectors": "2x8pin",
-      "tier": 3
-    }
-  },
-  {
-    "id": "gpu-rtx-5060ti",
-    "category": "gpu",
-    "name": "七彩虹 RTX 5060 Ti 16G",
-    "brand": "七彩虹",
-    "list_price": 3599,
-    "search_keywords": "RTX 5060 Ti 16G",
-    "specs": {
-      "vram_gb": 16,
-      "tdp": 180,
-      "length_mm": 305,
-      "power_connectors": "1x8pin",
-      "tier": 2
-    }
-  },
-  {
     "id": "ram-32g-6000",
     "category": "memory",
     "name": "金士顿 FURY 32GB(16x2) DDR5 6000",
