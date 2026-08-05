@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Any, Literal, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 Category = Literal["cpu", "motherboard", "gpu", "memory", "storage", "psu", "cooler", "case", "server"]
@@ -24,7 +24,10 @@ class PartOut(BaseModel):
 
 
 class SuggestRequest(BaseModel):
-    budget: float = Field(ge=2000, le=100000, description="总预算（元）")
+    budget: Optional[float] = Field(
+        default=None,
+        description="总预算（元）。不传或 null 则进入无预算性能匹配模式，返回多套对比方案",
+    )
     use_case: UseCase = "gaming_2k"
     resolution: Resolution = "1440p"
     locks: dict[str, str] = Field(
@@ -36,6 +39,16 @@ class SuggestRequest(BaseModel):
         description="兼容旧字段，等价于 locks.gpu",
     )
     include_live_prices: bool = True
+    alternative_limit: int = Field(default=3, ge=1, le=5, description="无预算模式下对比方案数量")
+
+    @field_validator("budget")
+    @classmethod
+    def _budget_range(cls, v: Optional[float]) -> Optional[float]:
+        if v is None:
+            return None
+        if v < 2000 or v > 100000:
+            raise ValueError("budget 须在 2000–100000 之间，或不传以启用无预算匹配")
+        return v
 
 
 class BuildPartItem(BaseModel):
@@ -53,7 +66,21 @@ class CompatIssue(BaseModel):
     message: str
 
 
+class BuildOption(BaseModel):
+    label: str
+    score: float
+    reasons: list[str] = Field(default_factory=list)
+    items: list[BuildPartItem]
+    total_catalog: float
+    total_effective: float
+    estimated_wattage: int
+    recommended_psu_wattage: int
+    issues: list[CompatIssue] = Field(default_factory=list)
+    notes: list[str] = Field(default_factory=list)
+
+
 class SuggestResponse(BaseModel):
+    mode: Literal["budget", "balanced"] = "budget"
     items: list[BuildPartItem]
     total_catalog: float
     total_effective: float
@@ -61,6 +88,10 @@ class SuggestResponse(BaseModel):
     recommended_psu_wattage: int
     issues: list[CompatIssue]
     notes: list[str] = Field(default_factory=list)
+    alternatives: list[BuildOption] = Field(
+        default_factory=list,
+        description="对比方案列表；无预算模式下降主推外的其它套，有预算时通常为空",
+    )
 
 
 class ValidateRequest(BaseModel):

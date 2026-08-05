@@ -4,6 +4,7 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import {
   API_BASE,
   Part,
+  BuildOption,
   SuggestResponse,
   UseCase,
   Resolution,
@@ -35,12 +36,14 @@ type Locks = Record<string, string>;
 
 export default function HomePage() {
   const [budget, setBudget] = useState(9000);
+  const [noBudget, setNoBudget] = useState(false);
   const [useCase, setUseCase] = useState<UseCase>("gaming_2k");
   const [resolution, setResolution] = useState<Resolution>("1440p");
   const [locks, setLocks] = useState<Locks>({});
   const [includeLive, setIncludeLive] = useState(false);
   const [catalog, setCatalog] = useState<Part[]>([]);
   const [result, setResult] = useState<SuggestResponse | null>(null);
+  const [activeAlt, setActiveAlt] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [okMsg, setOkMsg] = useState<string | null>(null);
@@ -81,11 +84,12 @@ export default function HomePage() {
 
   function buildPayload() {
     return {
-      budget,
+      budget: noBudget ? null : budget,
       use_case: useCase,
       resolution,
       locks,
       include_live_prices: includeLive,
+      alternative_limit: 3,
     };
   }
 
@@ -95,7 +99,9 @@ export default function HomePage() {
     setError(null);
     setOkMsg(null);
     try {
-      setResult(await suggestBuild(buildPayload()));
+      const data = await suggestBuild(buildPayload());
+      setResult(data);
+      setActiveAlt(0);
     } catch (err) {
       setError(err instanceof Error ? err.message : "请求失败");
     } finally {
@@ -136,8 +142,8 @@ export default function HomePage() {
       <header className="hero">
         <h1>PEIZHI 装机配智</h1>
         <p>
-          按预算与用途生成配置；也可自选 CPU / 显卡 / 主板等任意配件，其余自动补齐并做兼容校验。
-          当前目录含 {gpuCount} 款显卡可选。
+          可填预算智能分配，也可不填预算：按配件性能匹配与防拖后腿给出多套对比。
+          自选 CPU / 显卡等后，其余自动补齐并做兼容校验。当前目录含 {gpuCount} 款显卡。
         </p>
       </header>
 
@@ -152,7 +158,8 @@ export default function HomePage() {
                 max={100000}
                 value={budget}
                 onChange={(e) => setBudget(Number(e.target.value))}
-                required
+                disabled={noBudget}
+                required={!noBudget}
               />
             </label>
             <label>
@@ -173,6 +180,17 @@ export default function HomePage() {
                 <option value="1440p">1440p / 2K</option>
                 <option value="4k">4K</option>
               </select>
+            </label>
+          </div>
+
+          <div className="actions" style={{ marginTop: "0.75rem" }}>
+            <label style={{ flexDirection: "row", alignItems: "center", gap: "0.5rem" }}>
+              <input
+                type="checkbox"
+                checked={noBudget}
+                onChange={(e) => setNoBudget(e.target.checked)}
+              />
+              不填预算 · 按性能匹配出多套对比（防严重拖后腿）
             </label>
           </div>
 
@@ -222,30 +240,80 @@ export default function HomePage() {
         {okMsg && <p className="ok-text">{okMsg}</p>}
       </section>
 
-      {result && (
+      {result && (() => {
+        const alts = result.alternatives && result.alternatives.length > 0 ? result.alternatives : null;
+        const view: BuildOption | null = alts
+          ? alts[Math.min(activeAlt, alts.length - 1)]
+          : {
+              label: result.mode === "balanced" ? "主推" : "预算方案",
+              score: 0,
+              reasons: [],
+              items: result.items,
+              total_catalog: result.total_catalog,
+              total_effective: result.total_effective,
+              estimated_wattage: result.estimated_wattage,
+              recommended_psu_wattage: result.recommended_psu_wattage,
+              issues: result.issues,
+              notes: result.notes,
+            };
+        if (!view) return null;
+        return (
         <section className="card" style={{ marginTop: "1.25rem" }}>
+          {alts && alts.length > 1 && (
+            <div style={{ marginBottom: "1rem" }}>
+              <h3 className="section-title" style={{ marginTop: 0 }}>
+                多套对比（{result.mode === "balanced" ? "无预算·性能匹配" : "方案"}）
+              </h3>
+              <div className="actions" style={{ marginTop: "0.5rem" }}>
+                {alts.map((alt, idx) => (
+                  <button
+                    key={`${alt.label}-${idx}`}
+                    type="button"
+                    className={idx === activeAlt ? undefined : "secondary"}
+                    onClick={() => setActiveAlt(idx)}
+                  >
+                    {alt.label}
+                    <span style={{ opacity: 0.8, fontWeight: 500 }}>
+                      {" "}
+                      · ¥{alt.total_catalog.toFixed(0)}
+                    </span>
+                  </button>
+                ))}
+              </div>
+              {view.reasons.length > 0 && (
+                <ul className="issues" style={{ marginTop: "0.75rem" }}>
+                  {view.reasons.map((r) => (
+                    <li key={r} className="info">
+                      {r}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+
           <div className="summary">
             <div className="stat">
               <span>有效总价</span>
-              <strong>¥{result.total_effective.toFixed(0)}</strong>
+              <strong>¥{view.total_effective.toFixed(0)}</strong>
             </div>
             <div className="stat">
               <span>目录总价</span>
-              <strong>¥{result.total_catalog.toFixed(0)}</strong>
+              <strong>¥{view.total_catalog.toFixed(0)}</strong>
             </div>
             <div className="stat">
               <span>预估功耗</span>
-              <strong>{result.estimated_wattage}W</strong>
+              <strong>{view.estimated_wattage}W</strong>
             </div>
             <div className="stat">
               <span>建议电源</span>
-              <strong>{result.recommended_psu_wattage}W</strong>
+              <strong>{view.recommended_psu_wattage}W</strong>
             </div>
           </div>
 
-          {result.notes.length > 0 && (
+          {view.notes.length > 0 && (
             <ul className="issues">
-              {result.notes.map((n) => (
+              {view.notes.map((n) => (
                 <li key={n} className="info">
                   {n}
                 </li>
@@ -266,7 +334,7 @@ export default function HomePage() {
                 </tr>
               </thead>
               <tbody>
-                {result.items.map((item) => (
+                {view.items.map((item) => (
                   <tr key={item.part.id}>
                     <td>
                       {CATEGORY_LABEL[item.category] || item.category}
@@ -327,9 +395,9 @@ export default function HomePage() {
             </table>
           </div>
 
-          {result.issues.length > 0 && (
+          {view.issues.length > 0 && (
             <ul className="issues">
-              {result.issues.map((i) => (
+              {view.issues.map((i) => (
                 <li key={`${i.code}-${i.message}`} className={i.severity}>
                   [{i.severity}] {i.message}
                 </li>
@@ -337,7 +405,8 @@ export default function HomePage() {
             </ul>
           )}
         </section>
-      )}
+        );
+      })()}
 
       <p className="footer-note">
         API：{API_BASE} · 自选通过 <code>locks</code> 传入 · OpenAPI 见 /docs

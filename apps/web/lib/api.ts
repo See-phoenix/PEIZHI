@@ -28,7 +28,10 @@ export interface BuildPartItem {
   live_offers: Array<Record<string, unknown>>;
 }
 
-export interface SuggestResponse {
+export interface BuildOption {
+  label: string;
+  score: number;
+  reasons: string[];
   items: BuildPartItem[];
   total_catalog: number;
   total_effective: number;
@@ -36,6 +39,18 @@ export interface SuggestResponse {
   recommended_psu_wattage: number;
   issues: CompatIssue[];
   notes: string[];
+}
+
+export interface SuggestResponse {
+  mode: "budget" | "balanced";
+  items: BuildPartItem[];
+  total_catalog: number;
+  total_effective: number;
+  estimated_wattage: number;
+  recommended_psu_wattage: number;
+  issues: CompatIssue[];
+  notes: string[];
+  alternatives?: BuildOption[];
 }
 
 export interface ServerOfferItem {
@@ -110,12 +125,13 @@ export function listParts(category?: string) {
 }
 
 export function suggestBuild(body: {
-  budget: number;
+  budget?: number | null;
   use_case: UseCase;
   resolution: Resolution;
   locks?: Record<string, string>;
   lock_gpu_id?: string | null;
   include_live_prices: boolean;
+  alternative_limit?: number;
 }) {
   return request<SuggestResponse>("/api/builds/suggest", {
     method: "POST",
