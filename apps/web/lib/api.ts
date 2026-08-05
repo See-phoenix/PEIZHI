@@ -24,11 +24,17 @@ export interface BuildPartItem {
   part: Part;
   effective_price: number;
   price_source: string;
+  price_as_of?: string | null;
+  price_stale?: boolean;
+  price_age_hours?: number | null;
   buy_links: Record<string, string>;
   live_offers: Array<Record<string, unknown>>;
 }
 
-export interface SuggestResponse {
+export interface BuildOption {
+  label: string;
+  score: number;
+  reasons: string[];
   items: BuildPartItem[];
   total_catalog: number;
   total_effective: number;
@@ -36,6 +42,18 @@ export interface SuggestResponse {
   recommended_psu_wattage: number;
   issues: CompatIssue[];
   notes: string[];
+}
+
+export interface SuggestResponse {
+  mode: "budget" | "balanced";
+  items: BuildPartItem[];
+  total_catalog: number;
+  total_effective: number;
+  estimated_wattage: number;
+  recommended_psu_wattage: number;
+  issues: CompatIssue[];
+  notes: string[];
+  alternatives?: BuildOption[];
 }
 
 export interface ServerOfferItem {
@@ -65,6 +83,9 @@ export interface AggregatedPrice {
   live_best_price: number | null;
   effective_price: number;
   effective_source: string;
+  price_as_of?: string | null;
+  price_stale?: boolean;
+  price_age_hours?: number | null;
   buy_links: Array<{ platform: string; label: string; url: string }>;
   live_offers: Array<{
     platform: string;
@@ -110,12 +131,13 @@ export function listParts(category?: string) {
 }
 
 export function suggestBuild(body: {
-  budget: number;
+  budget?: number | null;
   use_case: UseCase;
   resolution: Resolution;
   locks?: Record<string, string>;
   lock_gpu_id?: string | null;
   include_live_prices: boolean;
+  alternative_limit?: number;
 }) {
   return request<SuggestResponse>("/api/builds/suggest", {
     method: "POST",

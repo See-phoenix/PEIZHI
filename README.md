@@ -6,7 +6,7 @@ API 优先的国内 **装机推荐** + **云服务器/VPS 选型** 系统：规�
 
 | 模块 | 说明 | 借鉴来源 |
 |------|------|----------|
-| 装机配智 | 预算+用途 → 兼容配置单 | Gestalt / pc-builder / Build Buddy |
+| 装机配智 | 有预算：连续分配；无预算：性能匹配多套对比（防严重拖后腿） | Gestalt / pc-builder / Build Buddy |
 | 服务器选型 | 场景+月预算+规格过滤 → 主推/备选套餐 | EC2 Instance Selector、VPS 场景矩阵、云比价站 |
 | 价格权威库 | 纠价入库，装机与服务器共用 | Scrabby 历史价思路 |
 
@@ -108,6 +108,26 @@ python scripts/export_openapi.py
 ```bash
 cd backend
 python -m pytest tests/ -q
+```
+
+## Agent Skills（Cursor）
+
+项目已引入前端设计相关 Agent Skills（`SKILL.md` 规范），安装在 `.agents/skills/`，Cursor 会按任务自动匹配加载：
+
+| Skill | 来源 | 用途 |
+|------|------|------|
+| `design-taste-frontend` | [Taste Skill](https://github.com/Leonxlnx/taste-skill) | 反模板化落地页 / 作品集 / 改版（v2） |
+| `web-design-engineer` 等 | [garden-skills](https://github.com/ConardLi/garden-skills) | 网页视觉工程、演示、文章、出图、知识库检索 |
+| `frontend-design` | [anthropics/skills](https://github.com/anthropics/skills)（Claude 官方） | 有辨识度的前端审美与排版指引 |
+
+版本锁定见根目录 `skills-lock.json`。更新示例：
+
+```bash
+npx skills update -p -y
+# 或按包重装
+npx skills add Leonxlnx/taste-skill --skill design-taste-frontend -y -a cursor --copy
+npx skills add ConardLi/garden-skills --skill '*' -y -a cursor --copy
+npx skills add anthropics/skills --skill frontend-design -y -a cursor --copy
 ```
 
 ## License

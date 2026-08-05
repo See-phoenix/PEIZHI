@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from sqlalchemy.orm import Session
@@ -10,6 +10,22 @@ from app.models import Part, PriceCorrection, PriceHistory, VerifiedPrice
 from app.providers.catalog_links import build_search_links
 from app.providers.serpapi import SerpApiShoppingProvider
 from app.schemas import AggregatedPrice, CorrectionCreate, CorrectionOut
+
+# Verified / live prices older than this are flagged as stale in API responses.
+STALE_AFTER_HOURS = 72.0
+
+
+def _utc_now() -> datetime:
+    return datetime.now(timezone.utc).replace(tzinfo=None)
+
+
+def _age_meta(
+    as_of: Optional[datetime], *, stale_after_hours: float = STALE_AFTER_HOURS
+) -> tuple[bool, Optional[float]]:
+    if not as_of:
+        return False, None
+    age_h = max(0.0, (_utc_now() - as_of).total_seconds() / 3600.0)
+    return age_h > stale_after_hours, round(age_h, 1)
 
 
 def get_verified_price(db: Session, part_id: str) -> Optional[VerifiedPrice]:
@@ -35,15 +51,24 @@ async def aggregate_price(
 
     live_best = min((o.price for o in live_offers), default=None)
 
+    price_as_of: Optional[datetime] = None
     if verified is not None:
         effective = verified.price
         source = "verified"
+        price_as_of = verified.updated_at or verified.verified_at
     elif live_best is not None:
         effective = live_best
         source = "live"
+        price_as_of = max((o.fetched_at for o in live_offers), default=_utc_now())
     else:
         effective = part.list_price
         source = "catalog"
+        price_as_of = getattr(part, "created_at", None)
+
+    stale, age_hours = _age_meta(price_as_of)
+    # Catalog seeds are reference-only; don't hard-flag as stale.
+    if source == "catalog":
+        stale = False
 
     return AggregatedPrice(
         part_id=part.id,
@@ -53,6 +78,9 @@ async def aggregate_price(
         live_best_price=live_best,
         effective_price=effective,
         effective_source=source,
+        price_as_of=price_as_of,
+        price_stale=stale,
+        price_age_hours=age_hours,
         buy_links=buy_links,
         live_offers=live_offers,
         live_available=live_available,
