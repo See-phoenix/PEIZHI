@@ -1,7 +1,8 @@
 "use client";
 
-import { FormEvent, useState } from "react";
-import { Gauge } from "lucide-react";
+import { FormEvent, useEffect, useState } from "react";
+import { Gauge, Sparkles } from "lucide-react";
+import gsap from "gsap";
 import {
   API_BASE,
   Part,
@@ -19,7 +20,10 @@ import { CorrectionDialog } from "@/components/correction-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
+import { MotionStage } from "@/components/fx/motion-stage";
+import { MascotBadge } from "@/components/fx/mascot";
 import { NumberTicker } from "@/components/magicui/number-ticker";
+import { prefersReducedMotion } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 const SCENE_LABEL: Record<ServerScene, string> = {
@@ -54,7 +58,16 @@ function SpecLine({ part }: { part: Part }) {
     s.region_label ? String(s.region_label) : null,
     s.gpu ? String(s.gpu) : null,
   ].filter(Boolean);
-  return <p className="mt-1 text-xs text-[var(--color-mute)]">{bits.join(" · ")}</p>;
+  return <p className="mt-1 text-xs text-[#b7a8c9]">{bits.join(" · ")}</p>;
+}
+
+function triggerFlash() {
+  if (prefersReducedMotion()) return;
+  const el = document.getElementById("acg-flash");
+  if (!el) return;
+  el.classList.remove("is-on");
+  void el.offsetWidth;
+  el.classList.add("is-on");
 }
 
 export default function ServersPage() {
@@ -68,15 +81,27 @@ export default function ServersPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [okMsg, setOkMsg] = useState<string | null>(null);
+  const [speedOn, setSpeedOn] = useState(false);
 
   const [correctPart, setCorrectPart] = useState<Part | null>(null);
   const [correctPrice, setCorrectPrice] = useState("");
   const [correctUrl, setCorrectUrl] = useState("");
 
+  useEffect(() => {
+    if (!result || prefersReducedMotion()) return;
+    gsap.fromTo(
+      "[data-offer-row]",
+      { y: 20, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.4, stagger: 0.06, ease: "power2.out" }
+    );
+  }, [result]);
+
   async function runSuggest() {
     setLoading(true);
     setError(null);
     setOkMsg(null);
+    setSpeedOn(true);
+    triggerFlash();
     try {
       const data = await suggestServers({
         monthly_budget: budget,
@@ -92,6 +117,7 @@ export default function ServersPage() {
       setError(err instanceof Error ? err.message : "请求失败");
     } finally {
       setLoading(false);
+      window.setTimeout(() => setSpeedOn(false), 600);
     }
   }
 
@@ -103,37 +129,47 @@ export default function ServersPage() {
   const rows: ServerOfferItem[] = result
     ? ([result.primary, ...result.alternatives].filter(Boolean) as ServerOfferItem[])
     : [];
-
   const primary = result?.primary;
 
   return (
-    <main className="mx-auto w-full max-w-[1380px] px-4 py-7 sm:px-6 sm:py-9">
-      <section className="animate-bay-in mb-8">
-        <p className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--color-mute)]">
-          <span className="led-dot" />
-          Cloud Rack · monthly pick
+    <MotionStage className="mx-auto w-full max-w-[1380px] px-4 py-7 sm:px-6 sm:py-9">
+      <div id="acg-flash" className="flash-overlay" />
+
+      <section data-anim="hero" className="relative mb-8">
+        <p className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#4de8ff]">
+          <Sparkles className="h-3.5 w-3.5 text-[#ff4d9a]" />
+          Cloud Neon Rack
         </p>
-        <h1 className="max-w-3xl font-[family-name:var(--font-display)] text-4xl font-extrabold tracking-tight text-[var(--color-ink)] sm:text-5xl">
-          <span className="text-[var(--color-copper-bright)]">配智</span>
-          <span className="text-[var(--color-mute)]"> / </span>
+        <h1 className="max-w-3xl font-[family-name:var(--font-display)] text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
+          <span className="bg-gradient-to-r from-[#4de8ff] via-[#a78bfa] to-[#ff4d9a] bg-clip-text text-transparent neon-text">
+            配智
+          </span>
+          <span className="text-white/40"> / </span>
           云主机选型
         </h1>
-        <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-[var(--color-mute)]">
-          按月预算与场景过滤规格；目录价为参考月费，活动价纠价入库后各端共用。
+        <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-[#b7a8c9]">
+          月预算 × 场景过滤规格；霓虹玻璃卡片展示主推与备选，活动价纠价后各端共用。
         </p>
-        <div className="copper-rule mt-6 max-w-xl" />
+        <div className="neon-rule mt-6 max-w-xl" />
+        <MascotBadge />
       </section>
 
       <div className="grid gap-5 lg:grid-cols-[290px_minmax(0,1fr)_250px]">
-        <aside className="animate-bay-in space-y-4 [animation-delay:60ms] lg:sticky lg:top-24 lg:self-start">
-          <Card>
+        <aside data-anim="panel" className="space-y-4 lg:sticky lg:top-24 lg:self-start">
+          <Card className="preserve-3d">
+            {speedOn && (
+              <div className="speed-lines">
+                <span style={{ top: "30%" }} />
+                <span style={{ top: "55%", animationDelay: "50ms" }} />
+              </div>
+            )}
             <CardHeader>
               <CardTitle>筛选条件</CardTitle>
               <CardDescription>场景 · 地域 · 规格下限</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={onSubmit} className="space-y-4">
-                <div className="space-y-1.5">
+                <div className="space-y-1.5" data-anim="item">
                   <Label htmlFor="monthly-budget">月预算（元）</Label>
                   <Input
                     id="monthly-budget"
@@ -146,7 +182,7 @@ export default function ServersPage() {
                     className="price-mono"
                   />
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-1.5" data-anim="item">
                   <Label htmlFor="scene">场景</Label>
                   <Select
                     id="scene"
@@ -160,7 +196,7 @@ export default function ServersPage() {
                     ))}
                   </Select>
                 </div>
-                <div className="space-y-1.5">
+                <div className="space-y-1.5" data-anim="item">
                   <Label htmlFor="region">地域偏好</Label>
                   <Select
                     id="region"
@@ -173,7 +209,7 @@ export default function ServersPage() {
                   </Select>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
+                  <div className="space-y-1.5" data-anim="item">
                     <Label htmlFor="min-vcpu">最低 vCPU</Label>
                     <Input
                       id="min-vcpu"
@@ -184,7 +220,7 @@ export default function ServersPage() {
                       className="price-mono"
                     />
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="space-y-1.5" data-anim="item">
                     <Label htmlFor="min-mem">最低内存 GB</Label>
                     <Input
                       id="min-mem"
@@ -196,15 +232,16 @@ export default function ServersPage() {
                     />
                   </div>
                 </div>
-                <label className="flex cursor-pointer items-start gap-2.5 rounded-md border border-[var(--color-edge)] bg-[var(--color-bay)]/50 p-3">
+                <label
+                  data-anim="item"
+                  className="flex cursor-pointer items-start gap-2.5 rounded-xl border border-white/10 bg-white/5 p-3"
+                >
                   <Checkbox
                     checked={includeLive}
                     onCheckedChange={(v) => setIncludeLive(v === true)}
                     className="mt-0.5"
                   />
-                  <span className="text-xs leading-relaxed text-[var(--color-mute)]">
-                    拉取实时搜索价
-                  </span>
+                  <span className="text-xs leading-relaxed text-[#b7a8c9]">拉取实时搜索价</span>
                 </label>
                 <Button type="submit" size="lg" className="w-full" disabled={loading}>
                   {loading ? "选型中…" : "生成推荐"}
@@ -214,14 +251,14 @@ export default function ServersPage() {
           </Card>
         </aside>
 
-        <section className="animate-bay-in min-w-0 space-y-4 [animation-delay:120ms]">
+        <section data-anim="panel" className="min-w-0 space-y-4">
           {(error || okMsg) && (
             <div
               className={cn(
-                "rounded-lg border px-4 py-3 text-sm",
+                "rounded-xl border px-4 py-3 text-sm backdrop-blur-md",
                 error
-                  ? "border-[var(--color-danger)]/35 bg-[var(--color-danger)]/10 text-[#f0b4ae]"
-                  : "border-[var(--color-solder)]/35 bg-[var(--color-solder)]/10 text-[#9fd9ce]"
+                  ? "border-[#ff6b7a]/40 bg-[#ff6b7a]/10 text-[#ffb4bc]"
+                  : "border-[#5dffc2]/35 bg-[#5dffc2]/10 text-[#b6ffe4]"
               )}
             >
               {error || okMsg}
@@ -229,14 +266,14 @@ export default function ServersPage() {
           )}
 
           {!result && !loading && (
-            <div className="bay-panel bay-sheet flex flex-col items-start justify-center gap-4 rounded-xl px-6 py-16 sm:px-10">
-              <p className="font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--color-ink)]">
-                还没有候选套餐
+            <div className="glass-panel flex flex-col items-start justify-center gap-4 rounded-2xl px-6 py-16 sm:px-10">
+              <p className="font-[family-name:var(--font-display)] text-2xl font-bold text-white">
+                机房还在待机
               </p>
-              <p className="max-w-md text-sm leading-relaxed text-[var(--color-mute)]">
-                左侧设好月预算与场景后，这里会列出主推与备选，并带评分理由。
+              <p className="max-w-md text-sm leading-relaxed text-[#b7a8c9]">
+                左侧设好月预算与场景，闪白一击后主推套餐会从星尘里浮现。
               </p>
-              <div className="copper-rule w-40" />
+              <div className="neon-rule w-40" />
             </div>
           )}
 
@@ -244,7 +281,10 @@ export default function ServersPage() {
             <Card>
               <CardContent className="space-y-3 py-8">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-20 animate-pulse rounded-md bg-[var(--color-edge)]/40" />
+                  <div
+                    key={i}
+                    className="h-20 animate-pulse rounded-xl bg-gradient-to-r from-[#4de8ff]/10 via-[#a78bfa]/10 to-transparent"
+                  />
                 ))}
               </CardContent>
             </Card>
@@ -252,20 +292,20 @@ export default function ServersPage() {
 
           {result && !loading && (
             <Card>
-              <CardHeader className="border-b border-[var(--color-edge)]">
+              <CardHeader className="border-b border-white/10">
                 <CardTitle>推荐套餐</CardTitle>
                 <CardDescription>{rows.length} 个候选 · 按评分排序</CardDescription>
               </CardHeader>
-              <CardContent className="bay-sheet p-0">
+              <CardContent className="p-0">
                 <ul>
                   {rows.map((item, idx) => (
                     <li
                       key={item.part.id}
+                      data-offer-row
                       className={cn(
-                        "animate-bay-in flex flex-col gap-3 border-b border-[var(--color-edge)]/70 px-5 py-4 sm:flex-row sm:items-center sm:justify-between",
-                        idx === 0 && "bg-[var(--color-copper)]/[0.06]"
+                        "flex flex-col gap-3 border-b border-white/8 px-5 py-4 transition hover:-translate-y-0.5 hover:bg-white/[0.04] hover:shadow-[0_0_24px_rgba(77,232,255,0.12)] sm:flex-row sm:items-center sm:justify-between",
+                        idx === 0 && "bg-[#ff4d9a]/[0.06]"
                       )}
-                      style={{ animationDelay: `${80 + idx * 45}ms` }}
                     >
                       <div className="min-w-0 flex-1">
                         <div className="mb-1 flex flex-wrap items-center gap-2">
@@ -273,27 +313,27 @@ export default function ServersPage() {
                           <Badge variant={SOURCE_VARIANT[item.price_source] || "default"}>
                             {SOURCE_LABEL[item.price_source] || item.price_source}
                           </Badge>
-                          <span className="inline-flex items-center gap-1 text-xs text-[var(--color-mute)]">
+                          <span className="inline-flex items-center gap-1 text-xs text-[#b7a8c9]">
                             <Gauge className="h-3 w-3" />
                             评分 {item.score}
                           </span>
                         </div>
-                        <p className="font-medium text-[var(--color-ink)]">{item.part.name}</p>
+                        <p className="font-medium text-white">{item.part.name}</p>
                         <SpecLine part={item.part} />
-                        <p className="mt-1.5 text-xs leading-relaxed text-[var(--color-mute)]">
+                        <p className="mt-1.5 text-xs leading-relaxed text-[#b7a8c9]">
                           {item.reasons.join("；")}
                         </p>
                       </div>
                       <div className="flex flex-wrap items-center gap-3 sm:justify-end">
                         <div className="text-right">
-                          <p className="price-mono text-lg font-semibold text-[var(--color-voltage)]">
+                          <p className="price-mono text-lg font-semibold text-[#4de8ff]">
                             ¥
                             <NumberTicker
                               value={Math.round(item.effective_price)}
-                              className="text-[var(--color-voltage)]"
+                              className="text-[#4de8ff]"
                             />
                           </p>
-                          <p className="text-[11px] text-[var(--color-mute)]">{item.price_unit}</p>
+                          <p className="text-[11px] text-[#b7a8c9]">{item.price_unit}</p>
                         </div>
                         <div className="flex gap-1.5">
                           {item.buy_links.official && (
@@ -301,7 +341,7 @@ export default function ServersPage() {
                               href={item.buy_links.official}
                               target="_blank"
                               rel="noreferrer"
-                              className="rounded border border-[var(--color-edge)] bg-[var(--color-rail)] px-2 py-1 text-xs text-[var(--color-aluminum)] no-underline hover:border-[var(--color-copper)]/40"
+                              className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs text-[#d8cef0] no-underline hover:border-[#4de8ff]/40"
                             >
                               官网
                             </a>
@@ -311,7 +351,7 @@ export default function ServersPage() {
                               href={item.buy_links.jd}
                               target="_blank"
                               rel="noreferrer"
-                              className="rounded border border-[var(--color-edge)] bg-[var(--color-rail)] px-2 py-1 text-xs text-[var(--color-aluminum)] no-underline hover:border-[var(--color-copper)]/40"
+                              className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs text-[#d8cef0] no-underline hover:border-[#ff4d9a]/40"
                             >
                               京东搜
                             </a>
@@ -342,7 +382,7 @@ export default function ServersPage() {
               {result.notes.map((n) => (
                 <li
                   key={n}
-                  className="rounded-lg border border-[var(--color-edge)] bg-[var(--color-panel)]/80 px-4 py-2.5 text-sm text-[var(--color-aluminum)]"
+                  className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-[#d8cef0]"
                 >
                   {n}
                 </li>
@@ -351,26 +391,24 @@ export default function ServersPage() {
           )}
         </section>
 
-        <aside className="animate-bay-in space-y-4 [animation-delay:180ms] lg:sticky lg:top-24 lg:self-start">
-          <Card className="border-[var(--color-copper)]/25">
+        <aside data-anim="panel" className="space-y-4 lg:sticky lg:top-24 lg:self-start">
+          <Card className="border-[#4de8ff]/25 shadow-[0_0_40px_rgba(77,232,255,0.15)]">
             <CardHeader>
-              <CardTitle className="text-[var(--color-voltage)]">主推方案</CardTitle>
+              <CardTitle className="text-[#4de8ff]">主推方案</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {primary ? (
                 <>
-                  <p className="text-sm font-medium leading-snug text-[var(--color-ink)]">
-                    {primary.part.name}
-                  </p>
-                  <p className="price-mono text-3xl font-bold text-[var(--color-ink)]">
+                  <p className="text-sm font-medium leading-snug text-white">{primary.part.name}</p>
+                  <p className="price-mono text-3xl font-bold text-white">
                     ¥
                     <NumberTicker
                       value={Math.round(primary.effective_price)}
                       className="text-3xl font-bold"
                     />
-                    <span className="ml-1 text-sm font-normal text-[var(--color-mute)]">/月</span>
+                    <span className="ml-1 text-sm font-normal text-[#b7a8c9]">/月</span>
                   </p>
-                  <p className="text-xs text-[var(--color-mute)]">
+                  <p className="text-xs text-[#b7a8c9]">
                     评分 <NumberTicker value={primary.score} />
                   </p>
                   <Button
@@ -383,9 +421,9 @@ export default function ServersPage() {
                   </Button>
                 </>
               ) : (
-                <p className="text-sm text-[var(--color-mute)]">生成后显示最优套餐摘要。</p>
+                <p className="text-sm text-[#b7a8c9]">生成后显示最优套餐摘要。</p>
               )}
-              <p className="text-[10px] tracking-wide text-[var(--color-mute)]">
+              <p className="text-[10px] tracking-wide text-[#b7a8c9]/80">
                 {API_BASE.replace(/^https?:\/\//, "")}/api/servers
               </p>
             </CardContent>
@@ -396,11 +434,9 @@ export default function ServersPage() {
               <CardTitle className="text-sm">提示</CardTitle>
             </CardHeader>
             <CardContent>
-              {!result && <p className="text-sm text-[var(--color-mute)]">选型后显示告警与说明。</p>}
+              {!result && <p className="text-sm text-[#b7a8c9]">选型后显示告警与说明。</p>}
               {result && result.issues.length === 0 && (
-                <p className="rounded-md bg-[var(--color-solder)]/10 px-3 py-2 text-sm text-[var(--color-solder)]">
-                  无严重问题
-                </p>
+                <p className="rounded-lg bg-[#5dffc2]/10 px-3 py-2 text-sm text-[#5dffc2]">无严重问题</p>
               )}
               {result && result.issues.length > 0 && (
                 <ul className="space-y-2">
@@ -408,10 +444,10 @@ export default function ServersPage() {
                     <li
                       key={`${i.code}-${i.message}`}
                       className={cn(
-                        "rounded-md px-3 py-2 text-xs",
-                        i.severity === "error" && "bg-[var(--color-danger)]/15 text-[#f0b4ae]",
-                        i.severity === "warning" && "bg-[var(--color-warn)]/15 text-[#f0c4a8]",
-                        i.severity === "info" && "bg-[var(--color-solder)]/10 text-[#9fd9ce]"
+                        "rounded-lg px-3 py-2 text-xs",
+                        i.severity === "error" && "bg-[#ff6b7a]/15 text-[#ffb4bc]",
+                        i.severity === "warning" && "bg-[#ffb454]/15 text-[#ffe0b0]",
+                        i.severity === "info" && "bg-[#4de8ff]/10 text-[#c8f7ff]"
                       )}
                     >
                       [{i.severity}] {i.message}
@@ -445,10 +481,10 @@ export default function ServersPage() {
           try {
             await runSuggest();
           } catch {
-            /* keep previous */
+            /* keep */
           }
         }}
       />
-    </main>
+    </MotionStage>
   );
 }

@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { Syne, Noto_Sans_SC, JetBrains_Mono } from "next/font/google";
+import { Orbitron, Noto_Sans_SC, JetBrains_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/site-header";
+import { PageAtmosphere } from "@/components/fx/page-atmosphere";
 import "./globals.css";
 
-const display = Syne({
+const display = Orbitron({
   subsets: ["latin"],
   variable: "--font-display",
   weight: ["600", "700", "800"],
@@ -22,16 +23,19 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PEIZHI 配智 · 装机与云主机选型",
-  description: "国内装机推荐 + 云服务器/VPS 选型 · 有效价匹配 · 用户纠价权威库",
+  title: "PEIZHI 配智 · 二次元装机台",
+  description: "国内装机推荐 + 云服务器选型 · 霓虹交互 · 有效价匹配",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="zh-CN" className={`${display.variable} ${body.variable} ${mono.variable}`}>
-      <body className="relative font-[family-name:var(--font-body)]">
-        <SiteHeader />
-        <div className="relative z-10">{children}</div>
+      <body className="relative overflow-x-hidden font-[family-name:var(--font-body)]">
+        <PageAtmosphere />
+        <div className="relative z-10">
+          <SiteHeader />
+          {children}
+        </div>
       </body>
     </html>
   );

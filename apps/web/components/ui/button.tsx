@@ -4,21 +4,21 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-voltage)]/50 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4de8ff]/60 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
         default:
-          "bg-[#c4783b] text-[#140f0a] shadow-[0_8px_24px_rgba(196,120,59,0.28)] hover:bg-[#e0944f]",
+          "bg-gradient-to-r from-[#ff4d9a] via-[#ff6bb0] to-[#4de8ff] text-[#140814] shadow-[0_0_24px_rgba(255,77,154,0.45)] hover:brightness-110 hover:shadow-[0_0_32px_rgba(77,232,255,0.4)]",
         secondary:
-          "border border-[#2a3342] bg-[#1b212b] text-[#e8ebf0] hover:border-[#c4783b]/40 hover:bg-[#151920]",
-        ghost: "text-[#8b93a3] hover:bg-white/5 hover:text-[#e8ebf0]",
+          "border border-white/15 bg-white/5 text-[#f4eef8] backdrop-blur-md hover:border-[#ff4d9a]/40 hover:bg-white/10",
+        ghost: "text-[#b7a8c9] hover:bg-white/5 hover:text-white",
         outline:
-          "border border-[#c4783b]/35 bg-transparent text-[#e0944f] hover:bg-[#c4783b]/10",
+          "border border-[#4de8ff]/40 bg-transparent text-[#4de8ff] hover:bg-[#4de8ff]/10 hover:shadow-[0_0_18px_rgba(77,232,255,0.25)]",
       },
       size: {
         default: "h-10 px-4 py-2",
-        sm: "h-8 rounded px-3 text-xs",
+        sm: "h-8 rounded-lg px-3 text-xs",
         lg: "h-11 px-6 text-[15px]",
         icon: "h-9 w-9",
       },

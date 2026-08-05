@@ -3,7 +3,11 @@ import { cn } from "@/lib/utils";
 
 const Card = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div ref={ref} className={cn("bay-panel relative overflow-hidden rounded-xl", className)} {...props} />
+    <div
+      ref={ref}
+      className={cn("glass-panel relative overflow-hidden rounded-2xl", className)}
+      {...props}
+    />
   )
 );
 Card.displayName = "Card";
@@ -20,7 +24,7 @@ const CardTitle = React.forwardRef<HTMLParagraphElement, React.HTMLAttributes<HT
     <h3
       ref={ref}
       className={cn(
-        "font-[family-name:var(--font-display)] text-base font-bold tracking-wide text-[var(--color-ink)]",
+        "font-[family-name:var(--font-display)] text-base font-bold tracking-wide text-white",
         className
       )}
       {...props}
@@ -33,7 +37,7 @@ const CardDescription = React.forwardRef<
   HTMLParagraphElement,
   React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => (
-  <p ref={ref} className={cn("text-sm text-[var(--color-mute)]", className)} {...props} />
+  <p ref={ref} className={cn("text-sm text-[#b7a8c9]", className)} {...props} />
 ));
 CardDescription.displayName = "CardDescription";
 

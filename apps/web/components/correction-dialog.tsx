@@ -125,10 +125,10 @@ export function CorrectionDialog({
               rows={2}
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              className="flex w-full rounded-md border border-[var(--color-edge)] bg-[var(--color-bay)]/70 px-3 py-2 text-sm text-[var(--color-ink)] outline-none transition focus:border-[var(--color-copper)]/50 focus:ring-2 focus:ring-[var(--color-copper)]/20"
+              className="flex w-full rounded-xl border border-white/12 bg-[#0b0614]/55 px-3 py-2 text-sm text-[#f4eef8] outline-none transition focus:border-[#ff4d9a]/50 focus:ring-2 focus:ring-[#ff4d9a]/20"
             />
           </div>
-          {error && <p className="text-sm text-[var(--color-danger)]">{error}</p>}
+          {error && <p className="text-sm text-[#ff6b7a]">{error}</p>}
           <div className="flex gap-2 pt-1">
             <Button type="submit" disabled={submitting}>
               {submitting ? "提交中…" : "提交纠价"}

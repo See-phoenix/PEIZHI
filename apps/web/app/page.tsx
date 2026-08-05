@@ -1,7 +1,8 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { AlertTriangle, Eraser, Lock, ShoppingCart } from "lucide-react";
+import { AlertTriangle, Eraser, Lock, ShoppingCart, Sparkles } from "lucide-react";
+import gsap from "gsap";
 import {
   API_BASE,
   Part,
@@ -20,7 +21,10 @@ import { CorrectionDialog } from "@/components/correction-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
+import { MotionStage } from "@/components/fx/motion-stage";
+import { MascotBadge } from "@/components/fx/mascot";
 import { NumberTicker } from "@/components/magicui/number-ticker";
+import { prefersReducedMotion } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 const CATEGORY_LABEL: Record<string, string> = {
@@ -62,6 +66,16 @@ function formatAsOf(iso?: string | null): string | null {
   });
 }
 
+function triggerFlash() {
+  if (prefersReducedMotion()) return;
+  const el = document.getElementById("acg-flash");
+  if (!el) return;
+  el.classList.remove("is-on");
+  // reflow
+  void el.offsetWidth;
+  el.classList.add("is-on");
+}
+
 export default function HomePage() {
   const [budget, setBudget] = useState(9000);
   const [noBudget, setNoBudget] = useState(false);
@@ -75,6 +89,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [okMsg, setOkMsg] = useState<string | null>(null);
+  const [speedOn, setSpeedOn] = useState(false);
 
   const [correctPart, setCorrectPart] = useState<Part | null>(null);
   const [correctPrice, setCorrectPrice] = useState("");
@@ -85,6 +100,16 @@ export default function HomePage() {
       .then((rows) => setCatalog(rows.filter((p) => p.category !== "server")))
       .catch(() => setCatalog([]));
   }, []);
+
+  useEffect(() => {
+    if (!result || prefersReducedMotion()) return;
+    const items = document.querySelectorAll("[data-bom-row]");
+    gsap.fromTo(
+      items,
+      { y: 22, opacity: 0, rotateX: 6 },
+      { y: 0, opacity: 1, rotateX: 0, duration: 0.45, stagger: 0.05, ease: "power2.out" }
+    );
+  }, [result, activeAlt]);
 
   const byCategory = useMemo(() => {
     const map: Record<string, Part[]> = {};
@@ -145,6 +170,8 @@ export default function HomePage() {
     setLoading(true);
     setError(null);
     setOkMsg(null);
+    setSpeedOn(true);
+    triggerFlash();
     try {
       const data = await suggestBuild(buildPayload());
       setResult(data);
@@ -153,6 +180,7 @@ export default function HomePage() {
       setError(err instanceof Error ? err.message : "请求失败");
     } finally {
       setLoading(false);
+      window.setTimeout(() => setSpeedOn(false), 600);
     }
   }
 
@@ -162,33 +190,45 @@ export default function HomePage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-[1380px] px-4 py-7 sm:px-6 sm:py-9">
-      <section className="animate-bay-in mb-8">
-        <p className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--color-mute)]">
-          <span className="led-dot" />
-          DIY Parts Bay · {gpuCount} GPU in catalog
+    <MotionStage className="mx-auto w-full max-w-[1380px] px-4 py-7 sm:px-6 sm:py-9">
+      <div id="acg-flash" className="flash-overlay" />
+
+      <section data-anim="hero" className="relative mb-8">
+        <p className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-[#ff7eb3]">
+          <Sparkles className="h-3.5 w-3.5 text-[#4de8ff]" />
+          Neon Parts Stage · {gpuCount} GPU
         </p>
-        <h1 className="max-w-3xl font-[family-name:var(--font-display)] text-4xl font-extrabold tracking-tight text-[var(--color-ink)] sm:text-5xl">
-          <span className="text-[var(--color-copper-bright)]">配智</span>
-          <span className="text-[var(--color-mute)]"> / </span>
-          装机配件台
+        <h1 className="max-w-3xl font-[family-name:var(--font-display)] text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
+          <span className="bg-gradient-to-r from-[#ff4d9a] via-[#ff9ec8] to-[#4de8ff] bg-clip-text text-transparent neon-text">
+            配智
+          </span>
+          <span className="text-white/40"> / </span>
+          二次元装机台
         </h1>
-        <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-[var(--color-mute)]">
-          填预算智能分配，或不填预算按性能匹配多套对比。自选锁定后自动补齐，选型优先权威有效价。
+        <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-[#b7a8c9]">
+          预算智能分配，或不填预算按性能匹配多套对比。霓虹玻璃面板里锁定配件，权威有效价驱动选型。
         </p>
-        <div className="copper-rule mt-6 max-w-xl" />
+        <div className="neon-rule mt-6 max-w-xl" />
+        <MascotBadge />
       </section>
 
       <div className="grid gap-5 lg:grid-cols-[290px_minmax(0,1fr)_250px]">
-        <aside className="animate-bay-in space-y-4 [animation-delay:60ms] lg:sticky lg:top-24 lg:self-start">
-          <Card>
+        <aside data-anim="panel" className="space-y-4 lg:sticky lg:top-24 lg:self-start">
+          <Card className="preserve-3d">
+            {speedOn && (
+              <div className="speed-lines">
+                <span style={{ top: "28%" }} />
+                <span style={{ top: "48%", animationDelay: "40ms" }} />
+                <span style={{ top: "68%", animationDelay: "80ms" }} />
+              </div>
+            )}
             <CardHeader>
               <CardTitle>需求参数</CardTitle>
-              <CardDescription>预算 · 用途 · 分辨率 · 锁定</CardDescription>
+              <CardDescription>预算 · 用途 · 锁定 · 霓虹出击</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={onSubmit} className="space-y-4">
-                <div className="space-y-1.5">
+                <div className="space-y-1.5" data-anim="item">
                   <Label htmlFor="budget">预算（元）</Label>
                   <Input
                     id="budget"
@@ -203,18 +243,21 @@ export default function HomePage() {
                   />
                 </div>
 
-                <label className="flex cursor-pointer items-start gap-2.5 rounded-md border border-[var(--color-edge)] bg-[var(--color-bay)]/50 p-3">
+                <label
+                  data-anim="item"
+                  className="flex cursor-pointer items-start gap-2.5 rounded-xl border border-white/10 bg-white/5 p-3"
+                >
                   <Checkbox
                     checked={noBudget}
                     onCheckedChange={(v) => setNoBudget(v === true)}
                     className="mt-0.5"
                   />
-                  <span className="text-xs leading-relaxed text-[var(--color-mute)]">
+                  <span className="text-xs leading-relaxed text-[#b7a8c9]">
                     不填预算 · 按性能匹配多套对比
                   </span>
                 </label>
 
-                <div className="space-y-1.5">
+                <div className="space-y-1.5" data-anim="item">
                   <Label htmlFor="use-case">用途</Label>
                   <Select
                     id="use-case"
@@ -227,7 +270,7 @@ export default function HomePage() {
                   </Select>
                 </div>
 
-                <div className="space-y-1.5">
+                <div className="space-y-1.5" data-anim="item">
                   <Label htmlFor="resolution">分辨率</Label>
                   <Select
                     id="resolution"
@@ -240,17 +283,17 @@ export default function HomePage() {
                   </Select>
                 </div>
 
-                <div className="border-t border-[var(--color-edge)] pt-4">
+                <div className="border-t border-white/10 pt-4">
                   <div className="mb-3 flex items-center justify-between">
-                    <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--color-mute)]">
-                      <Lock className="h-3.5 w-3.5" />
+                    <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#b7a8c9]">
+                      <Lock className="h-3.5 w-3.5 text-[#4de8ff]" />
                       自选锁定
                     </p>
                     <Badge variant="muted">{lockCount} 项</Badge>
                   </div>
                   <div className="max-h-[300px] space-y-3 overflow-y-auto pr-1">
                     {LOCKABLE.map((cat) => (
-                      <div key={cat} className="space-y-1.5">
+                      <div key={cat} className="space-y-1.5" data-anim="item">
                         <Label htmlFor={`lock-${cat}`}>
                           {CATEGORY_LABEL[cat]}
                           {cat === "gpu" ? ` · ${gpuCount}` : ""}
@@ -272,13 +315,16 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                <label className="flex cursor-pointer items-start gap-2.5 rounded-md border border-[var(--color-edge)] bg-[var(--color-bay)]/50 p-3">
+                <label
+                  data-anim="item"
+                  className="flex cursor-pointer items-start gap-2.5 rounded-xl border border-white/10 bg-white/5 p-3"
+                >
                   <Checkbox
                     checked={includeLive}
                     onCheckedChange={(v) => setIncludeLive(v === true)}
                     className="mt-0.5"
                   />
-                  <span className="text-xs leading-relaxed text-[var(--color-mute)]">
+                  <span className="text-xs leading-relaxed text-[#b7a8c9]">
                     拉取实时搜索价（需配置 SerpApi）
                   </span>
                 </label>
@@ -297,14 +343,14 @@ export default function HomePage() {
           </Card>
         </aside>
 
-        <section className="animate-bay-in min-w-0 space-y-4 [animation-delay:120ms]">
+        <section data-anim="panel" className="min-w-0 space-y-4">
           {(error || okMsg) && (
             <div
               className={cn(
-                "rounded-lg border px-4 py-3 text-sm",
+                "rounded-xl border px-4 py-3 text-sm backdrop-blur-md",
                 error
-                  ? "border-[var(--color-danger)]/35 bg-[var(--color-danger)]/10 text-[#f0b4ae]"
-                  : "border-[var(--color-solder)]/35 bg-[var(--color-solder)]/10 text-[#9fd9ce]"
+                  ? "border-[#ff6b7a]/40 bg-[#ff6b7a]/10 text-[#ffb4bc]"
+                  : "border-[#5dffc2]/35 bg-[#5dffc2]/10 text-[#b6ffe4]"
               )}
             >
               {error || okMsg}
@@ -312,14 +358,14 @@ export default function HomePage() {
           )}
 
           {!result && !loading && (
-            <div className="bay-panel bay-sheet flex flex-col items-start justify-center gap-4 rounded-xl px-6 py-16 sm:px-10">
-              <p className="font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--color-ink)]">
-                配置单还是空的
+            <div className="glass-panel relative flex flex-col items-start justify-center gap-4 overflow-hidden rounded-2xl px-6 py-16 sm:px-10">
+              <p className="font-[family-name:var(--font-display)] text-2xl font-bold text-white">
+                配置单还在次元裂缝里
               </p>
-              <p className="max-w-md text-sm leading-relaxed text-[var(--color-mute)]">
-                左侧设定预算或开启无预算匹配，点「生成配置单」后，这里会列出完整 BOM 与购买链接。
+              <p className="max-w-md text-sm leading-relaxed text-[#b7a8c9]">
+                左侧设定预算或开启无预算匹配，点「生成配置单」——闪白、速度线、BOM 清单会一起登场。
               </p>
-              <div className="copper-rule w-40" />
+              <div className="neon-rule w-40" />
             </div>
           )}
 
@@ -329,8 +375,7 @@ export default function HomePage() {
                 {[1, 2, 3, 4].map((i) => (
                   <div
                     key={i}
-                    className="h-14 animate-pulse rounded-md bg-[var(--color-edge)]/40"
-                    style={{ animationDelay: `${i * 80}ms` }}
+                    className="h-14 animate-pulse rounded-xl bg-gradient-to-r from-[#ff4d9a]/10 via-[#4de8ff]/10 to-transparent"
                   />
                 ))}
               </CardContent>
@@ -338,8 +383,8 @@ export default function HomePage() {
           )}
 
           {view && !loading && (
-            <Card className="overflow-hidden">
-              <CardHeader className="space-y-3 border-b border-[var(--color-edge)]">
+            <Card>
+              <CardHeader className="space-y-3 border-b border-white/10">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <CardTitle>配置清单 · BOM</CardTitle>
@@ -371,7 +416,7 @@ export default function HomePage() {
                     {view.reasons.map((r) => (
                       <li
                         key={r}
-                        className="rounded-md border border-[var(--color-copper)]/15 bg-[var(--color-copper)]/5 px-3 py-1.5 text-xs text-[var(--color-aluminum)]"
+                        className="rounded-lg border border-[#4de8ff]/20 bg-[#4de8ff]/5 px-3 py-1.5 text-xs text-[#c8f7ff]"
                       >
                         {r}
                       </li>
@@ -379,20 +424,20 @@ export default function HomePage() {
                   </ul>
                 )}
               </CardHeader>
-              <CardContent className="bay-sheet p-0">
+              <CardContent className="p-0">
                 <ul>
-                  {view.items.map((item, idx) => {
+                  {view.items.map((item) => {
                     const locked = locks[item.category] === item.part.id;
                     const asOf = formatAsOf(item.price_as_of);
                     return (
                       <li
                         key={item.part.id}
-                        className="animate-bay-in flex flex-col gap-3 border-b border-[var(--color-edge)]/70 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
-                        style={{ animationDelay: `${80 + idx * 40}ms` }}
+                        data-bom-row
+                        className="group flex flex-col gap-3 border-b border-white/8 px-5 py-4 transition hover:-translate-y-0.5 hover:bg-white/[0.04] hover:shadow-[0_0_24px_rgba(255,77,154,0.12)] sm:flex-row sm:items-center sm:justify-between"
                       >
                         <div className="min-w-0 flex-1">
                           <div className="mb-1 flex flex-wrap items-center gap-2">
-                            <span className="price-mono text-[11px] font-semibold uppercase tracking-wider text-[var(--color-mute)]">
+                            <span className="price-mono text-[11px] font-semibold uppercase tracking-wider text-[#b7a8c9]">
                               {CATEGORY_LABEL[item.category] || item.category}
                             </span>
                             {locked && <Badge variant="locked">自选</Badge>}
@@ -408,18 +453,18 @@ export default function HomePage() {
                               </Badge>
                             )}
                           </div>
-                          <p className="truncate font-medium text-[var(--color-ink)]">{item.part.name}</p>
-                          <p className="mt-0.5 text-xs text-[var(--color-mute)]">
+                          <p className="truncate font-medium text-white">{item.part.name}</p>
+                          <p className="mt-0.5 text-xs text-[#b7a8c9]">
                             目录 ¥{item.part.list_price}
                             {asOf ? ` · 更新于 ${asOf}` : ""}
                           </p>
                         </div>
                         <div className="flex flex-wrap items-center gap-3 sm:justify-end">
-                          <p className="price-mono text-lg font-semibold text-[var(--color-voltage)]">
+                          <p className="price-mono text-lg font-semibold text-[#4de8ff]">
                             ¥
                             <NumberTicker
                               value={Math.round(item.effective_price)}
-                              className="text-[var(--color-voltage)]"
+                              className="text-[#4de8ff]"
                             />
                           </p>
                           <div className="flex flex-wrap gap-1.5">
@@ -430,7 +475,7 @@ export default function HomePage() {
                                   href={item.buy_links[key]}
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="inline-flex items-center gap-1 rounded border border-[var(--color-edge)] bg-[var(--color-rail)] px-2 py-1 text-xs text-[var(--color-aluminum)] no-underline hover:border-[var(--color-copper)]/40 hover:text-[var(--color-ink)]"
+                                  className="inline-flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs text-[#d8cef0] no-underline hover:border-[#ff4d9a]/40 hover:text-white"
                                 >
                                   {key === "jd" && <ShoppingCart className="h-3 w-3" />}
                                   {key === "jd" ? "京东" : key === "tmall" ? "天猫" : "拼多多"}
@@ -464,7 +509,7 @@ export default function HomePage() {
               {view.notes.map((n) => (
                 <li
                   key={n}
-                  className="rounded-lg border border-[var(--color-edge)] bg-[var(--color-panel)]/80 px-4 py-2.5 text-sm text-[var(--color-aluminum)]"
+                  className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-[#d8cef0] backdrop-blur-md"
                 >
                   {n}
                 </li>
@@ -473,15 +518,15 @@ export default function HomePage() {
           )}
         </section>
 
-        <aside className="animate-bay-in space-y-4 [animation-delay:180ms] lg:sticky lg:top-24 lg:self-start">
-          <Card className="border-[var(--color-copper)]/25">
+        <aside data-anim="panel" className="space-y-4 lg:sticky lg:top-24 lg:self-start">
+          <Card className="border-[#ff4d9a]/25 shadow-[0_0_40px_rgba(255,77,154,0.15)]">
             <CardHeader>
-              <CardTitle className="text-[var(--color-voltage)]">总览</CardTitle>
+              <CardTitle className="text-[#ff9ec8]">总览</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <p className="text-[11px] uppercase tracking-[0.14em] text-[var(--color-mute)]">有效总价</p>
-                <p className="price-mono mt-1 text-3xl font-bold text-[var(--color-ink)]">
+                <p className="text-[11px] uppercase tracking-[0.14em] text-[#b7a8c9]">有效总价</p>
+                <p className="price-mono mt-1 text-3xl font-bold text-white">
                   ¥
                   {view ? (
                     <NumberTicker value={Math.round(view.total_effective)} className="text-3xl font-bold" />
@@ -489,18 +534,18 @@ export default function HomePage() {
                     "—"
                   )}
                 </p>
-                <p className="mt-1 text-xs text-[var(--color-mute)]">
+                <p className="mt-1 text-xs text-[#b7a8c9]">
                   目录合计 ¥{view ? Math.round(view.total_catalog) : "—"}
                 </p>
                 {staleCount > 0 && (
-                  <p className="mt-2 text-xs text-[var(--color-warn)]">
+                  <p className="mt-2 text-xs text-[#ffb454]">
                     {staleCount} 项权威价超过 72 小时，建议纠价
                   </p>
                 )}
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <div className="rounded-md border border-[var(--color-edge)] bg-[var(--color-bay)]/60 p-3">
-                  <p className="text-[11px] text-[var(--color-mute)]">预估功耗</p>
+                <div className="rounded-xl border border-white/10 bg-[#0b0614]/45 p-3">
+                  <p className="text-[11px] text-[#b7a8c9]">预估功耗</p>
                   <p className="price-mono mt-1 text-base font-semibold">
                     {view ? (
                       <>
@@ -511,8 +556,8 @@ export default function HomePage() {
                     )}
                   </p>
                 </div>
-                <div className="rounded-md border border-[var(--color-edge)] bg-[var(--color-bay)]/60 p-3">
-                  <p className="text-[11px] text-[var(--color-mute)]">建议电源</p>
+                <div className="rounded-xl border border-white/10 bg-[#0b0614]/45 p-3">
+                  <p className="text-[11px] text-[#b7a8c9]">建议电源</p>
                   <p className="price-mono mt-1 text-base font-semibold">
                     {view ? (
                       <>
@@ -529,7 +574,7 @@ export default function HomePage() {
                   刷新配置
                 </Button>
               )}
-              <p className="text-[10px] tracking-wide text-[var(--color-mute)]">
+              <p className="text-[10px] tracking-wide text-[#b7a8c9]/80">
                 API {API_BASE.replace(/^https?:\/\//, "")}
               </p>
             </CardContent>
@@ -538,16 +583,14 @@ export default function HomePage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-sm">
-                <AlertTriangle className="h-4 w-4 text-[var(--color-voltage)]" />
+                <AlertTriangle className="h-4 w-4 text-[#ffb454]" />
                 兼容与提示
               </CardTitle>
             </CardHeader>
             <CardContent>
-              {!view && (
-                <p className="text-sm text-[var(--color-mute)]">生成后显示插座、供电、机箱等兼容问题。</p>
-              )}
+              {!view && <p className="text-sm text-[#b7a8c9]">生成后显示插座、供电、机箱等兼容问题。</p>}
               {view && view.issues.length === 0 && (
-                <p className="rounded-md bg-[var(--color-solder)]/10 px-3 py-2 text-sm text-[var(--color-solder)]">
+                <p className="rounded-lg bg-[#5dffc2]/10 px-3 py-2 text-sm text-[#5dffc2]">
                   未发现严重兼容问题
                 </p>
               )}
@@ -557,10 +600,10 @@ export default function HomePage() {
                     <li
                       key={`${i.code}-${i.message}`}
                       className={cn(
-                        "rounded-md px-3 py-2 text-xs leading-relaxed",
-                        i.severity === "error" && "bg-[var(--color-danger)]/15 text-[#f0b4ae]",
-                        i.severity === "warning" && "bg-[var(--color-warn)]/15 text-[#f0c4a8]",
-                        i.severity === "info" && "bg-[var(--color-solder)]/10 text-[#9fd9ce]"
+                        "rounded-lg px-3 py-2 text-xs leading-relaxed",
+                        i.severity === "error" && "bg-[#ff6b7a]/15 text-[#ffb4bc]",
+                        i.severity === "warning" && "bg-[#ffb454]/15 text-[#ffe0b0]",
+                        i.severity === "info" && "bg-[#4de8ff]/10 text-[#c8f7ff]"
                       )}
                     >
                       <span className="font-semibold uppercase">[{i.severity}]</span> {i.message}
@@ -594,10 +637,10 @@ export default function HomePage() {
           try {
             setResult(await suggestBuild(buildPayload()));
           } catch {
-            /* keep previous */
+            /* keep */
           }
         }}
       />
-    </main>
+    </MotionStage>
   );
 }

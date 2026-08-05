@@ -14,7 +14,7 @@ const DialogOverlay = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DialogPrimitive.Overlay
     ref={ref}
-    className={cn("fixed inset-0 z-50 bg-[var(--color-bay)]/75 backdrop-blur-sm", className)}
+    className={cn("fixed inset-0 z-50 bg-[#0b0614]/75 backdrop-blur-md", className)}
     {...props}
   />
 ));
@@ -29,13 +29,13 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "bay-panel fixed left-1/2 top-1/2 z-50 w-[min(440px,calc(100%-2rem))] -translate-x-1/2 -translate-y-1/2 rounded-xl p-6 outline-none",
+        "glass-panel fixed left-1/2 top-1/2 z-50 w-[min(440px,calc(100%-2rem))] -translate-x-1/2 -translate-y-1/2 rounded-2xl p-6 outline-none",
         className
       )}
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-md p-1 text-[var(--color-mute)] transition hover:bg-white/5 hover:text-[var(--color-ink)]">
+      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-md p-1 text-[#b7a8c9] transition hover:bg-white/5 hover:text-white">
         <X className="h-4 w-4" />
         <span className="sr-only">关闭</span>
       </DialogPrimitive.Close>
@@ -55,7 +55,7 @@ function DialogTitle({
   return (
     <DialogPrimitive.Title
       className={cn(
-        "font-[family-name:var(--font-display)] text-lg font-bold text-[var(--color-ink)]",
+        "font-[family-name:var(--font-display)] text-lg font-bold text-white",
         className
       )}
       {...props}
