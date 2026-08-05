@@ -248,7 +248,11 @@
       "type": "air",
       "tdp_rating": 220,
       "height_mm": 155,
-      "sockets": ["AM5", "AM4", "LGA1700"]
+      "sockets": [
+        "AM5",
+        "AM4",
+        "LGA1700"
+      ]
     }
   },
   {
@@ -262,7 +266,11 @@
       "type": "air",
       "tdp_rating": 160,
       "height_mm": 148,
-      "sockets": ["AM5", "AM4", "LGA1700"]
+      "sockets": [
+        "AM5",
+        "AM4",
+        "LGA1700"
+      ]
     }
   },
   {
@@ -276,7 +284,11 @@
       "type": "aio",
       "tdp_rating": 300,
       "radiator_mm": 360,
-      "sockets": ["AM5", "AM4", "LGA1700"]
+      "sockets": [
+        "AM5",
+        "AM4",
+        "LGA1700"
+      ]
     }
   },
   {
@@ -287,7 +299,10 @@
     "list_price": 399,
     "search_keywords": "联力 A3",
     "specs": {
-      "form_factors": ["mATX", "ITX"],
+      "form_factors": [
+        "mATX",
+        "ITX"
+      ],
       "gpu_max_mm": 415,
       "cooler_max_mm": 165,
       "psu_max_mm": 220
@@ -301,7 +316,11 @@
     "list_price": 269,
     "search_keywords": "瓦尔基里 VK03",
     "specs": {
-      "form_factors": ["ATX", "mATX", "ITX"],
+      "form_factors": [
+        "ATX",
+        "mATX",
+        "ITX"
+      ],
       "gpu_max_mm": 400,
       "cooler_max_mm": 170,
       "psu_max_mm": 200
@@ -315,10 +334,239 @@
     "list_price": 899,
     "search_keywords": "联力 O11 EVO",
     "specs": {
-      "form_factors": ["ATX", "mATX", "ITX"],
+      "form_factors": [
+        "ATX",
+        "mATX",
+        "ITX"
+      ],
       "gpu_max_mm": 420,
       "cooler_max_mm": 167,
       "psu_max_mm": 220
+    }
+  },
+  {
+    "id": "cpu-r5-7500f",
+    "category": "cpu",
+    "name": "AMD 锐龙5 7500F",
+    "brand": "AMD",
+    "list_price": 899,
+    "search_keywords": "锐龙5 7500F",
+    "specs": {
+      "socket": "AM5",
+      "cores": 6,
+      "threads": 12,
+      "tdp": 65,
+      "memory": "DDR5",
+      "igpu": false,
+      "tier": 1
+    }
+  },
+  {
+    "id": "cpu-r5-8600g",
+    "category": "cpu",
+    "name": "AMD 锐龙5 8600G",
+    "brand": "AMD",
+    "list_price": 1199,
+    "search_keywords": "锐龙5 8600G",
+    "specs": {
+      "socket": "AM5",
+      "cores": 6,
+      "threads": 12,
+      "tdp": 65,
+      "memory": "DDR5",
+      "igpu": true,
+      "tier": 2
+    }
+  },
+  {
+    "id": "cpu-r7-7700",
+    "category": "cpu",
+    "name": "AMD 锐龙7 7700",
+    "brand": "AMD",
+    "list_price": 1699,
+    "search_keywords": "锐龙7 7700",
+    "specs": {
+      "socket": "AM5",
+      "cores": 8,
+      "threads": 16,
+      "tdp": 65,
+      "memory": "DDR5",
+      "igpu": true,
+      "tier": 3
+    }
+  },
+  {
+    "id": "mb-a620m-wifi",
+    "category": "motherboard",
+    "name": "华硕 PRIME A620M-A WIFI",
+    "brand": "华硕",
+    "list_price": 549,
+    "search_keywords": "华硕 A620M-A WIFI",
+    "specs": {
+      "socket": "AM5",
+      "chipset": "A620",
+      "form_factor": "mATX",
+      "memory": "DDR5",
+      "max_memory_mhz": 7200,
+      "wifi": true,
+      "tier": 1
+    }
+  },
+  {
+    "id": "mb-b650m-hdv",
+    "category": "motherboard",
+    "name": "华擎 B650M-HDV/M.2",
+    "brand": "华擎",
+    "list_price": 699,
+    "search_keywords": "华擎 B650M-HDV",
+    "specs": {
+      "socket": "AM5",
+      "chipset": "B650",
+      "form_factor": "mATX",
+      "memory": "DDR5",
+      "max_memory_mhz": 7200,
+      "wifi": false,
+      "tier": 2
+    }
+  },
+  {
+    "id": "ssd-512-kioxia",
+    "category": "storage",
+    "name": "铠侠 RC20 512GB NVMe",
+    "brand": "铠侠",
+    "list_price": 229,
+    "search_keywords": "铠侠 RC20 512G",
+    "specs": {
+      "capacity_gb": 512,
+      "interface": "NVMe",
+      "pcie": "3.0",
+      "tier": 1
+    }
+  },
+  {
+    "id": "ssd-2tb-sn7100",
+    "category": "storage",
+    "name": "西部数据 SN7100 2TB NVMe",
+    "brand": "西部数据",
+    "list_price": 899,
+    "search_keywords": "WD SN7100 2TB",
+    "specs": {
+      "capacity_gb": 2000,
+      "interface": "NVMe",
+      "pcie": "4.0",
+      "tier": 4
+    }
+  },
+  {
+    "id": "psu-450b",
+    "category": "psu",
+    "name": "航嘉 WD450K 铜牌非模组",
+    "brand": "航嘉",
+    "list_price": 199,
+    "search_keywords": "航嘉 WD450K",
+    "specs": {
+      "wattage": 450,
+      "efficiency": "Bronze",
+      "modular": "none",
+      "atx31": false,
+      "tier": 1
+    }
+  },
+  {
+    "id": "psu-550b",
+    "category": "psu",
+    "name": "长城 HOPE 550 铜牌",
+    "brand": "长城",
+    "list_price": 279,
+    "search_keywords": "长城 HOPE 550",
+    "specs": {
+      "wattage": 550,
+      "efficiency": "Bronze",
+      "modular": "none",
+      "atx31": false,
+      "tier": 2
+    }
+  },
+  {
+    "id": "psu-1000g",
+    "category": "psu",
+    "name": "海韵 FOCUS GX-1000 金牌全模组",
+    "brand": "海韵",
+    "list_price": 999,
+    "search_keywords": "海韵 FOCUS GX 1000",
+    "specs": {
+      "wattage": 1000,
+      "efficiency": "Gold",
+      "modular": "full",
+      "atx31": true,
+      "tier": 5
+    }
+  },
+  {
+    "id": "case-chase-m3",
+    "category": "case",
+    "name": "先马 平头哥 M3 mATX",
+    "brand": "先马",
+    "list_price": 149,
+    "search_keywords": "先马 平头哥 M3",
+    "specs": {
+      "form_factors": [
+        "mATX",
+        "ITX"
+      ],
+      "gpu_max_mm": 330,
+      "cooler_max_mm": 160,
+      "psu_max_mm": 160,
+      "tier": 1
+    }
+  },
+  {
+    "id": "ram-32g-5600",
+    "category": "memory",
+    "name": "金百达 银爵 32GB(16x2) DDR5 5600",
+    "brand": "金百达",
+    "list_price": 449,
+    "search_keywords": "金百达 银爵 DDR5 5600 32G",
+    "specs": {
+      "type": "DDR5",
+      "capacity_gb": 32,
+      "speed_mhz": 5600,
+      "modules": 2,
+      "expo": true,
+      "tier": 2
+    }
+  },
+  {
+    "id": "ram-64g-6000",
+    "category": "memory",
+    "name": "金士顿 FURY 64GB(32x2) DDR5 6000",
+    "brand": "金士顿",
+    "list_price": 1299,
+    "search_keywords": "金士顿 DDR5 6000 64G",
+    "specs": {
+      "type": "DDR5",
+      "capacity_gb": 64,
+      "speed_mhz": 6000,
+      "modules": 2,
+      "expo": true,
+      "tier": 5
+    }
+  },
+  {
+    "id": "cpu-r3-8300g",
+    "category": "cpu",
+    "name": "AMD 锐龙3 8300G",
+    "brand": "AMD",
+    "list_price": 799,
+    "search_keywords": "锐龙3 8300G",
+    "specs": {
+      "socket": "AM5",
+      "cores": 4,
+      "threads": 8,
+      "tdp": 65,
+      "memory": "DDR5",
+      "igpu": true,
+      "tier": 1
     }
   }
 ]

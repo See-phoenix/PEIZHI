@@ -17,7 +17,7 @@ def estimate_system_wattage(parts: Iterable[Part]) -> int:
 
 def recommended_psu_wattage(estimated: int) -> int:
     target = int(estimated * 1.4)
-    for w in (550, 650, 750, 850, 1000, 1200):
+    for w in (450, 550, 650, 750, 850, 1000, 1200):
         if w >= target:
             return w
     return 1200
