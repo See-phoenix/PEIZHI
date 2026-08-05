@@ -37,7 +37,7 @@ export default function HomePage() {
   const [budget, setBudget] = useState(9000);
   const [useCase, setUseCase] = useState<UseCase>("gaming_2k");
   const [resolution, setResolution] = useState<Resolution>("1440p");
-  const [locks, setLocks] = useState<Locks>({ gpu: "gpu-rx-9070-gre" });
+  const [locks, setLocks] = useState<Locks>({});
   const [includeLive, setIncludeLive] = useState(false);
   const [catalog, setCatalog] = useState<Part[]>([]);
   const [result, setResult] = useState<SuggestResponse | null>(null);
