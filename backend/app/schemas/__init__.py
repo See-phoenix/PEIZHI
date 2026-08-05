@@ -56,6 +56,9 @@ class BuildPartItem(BaseModel):
     part: PartOut
     effective_price: float
     price_source: str  # verified / live / catalog
+    price_as_of: Optional[datetime] = None
+    price_stale: bool = False
+    price_age_hours: Optional[float] = None
     buy_links: dict[str, str] = Field(default_factory=dict)
     live_offers: list[dict[str, Any]] = Field(default_factory=list)
 
@@ -129,6 +132,9 @@ class AggregatedPrice(BaseModel):
     live_best_price: Optional[float] = None
     effective_price: float
     effective_source: str
+    price_as_of: Optional[datetime] = None
+    price_stale: bool = False
+    price_age_hours: Optional[float] = None
     buy_links: list[SearchLink]
     live_offers: list[LiveOffer] = Field(default_factory=list)
     live_available: bool = False

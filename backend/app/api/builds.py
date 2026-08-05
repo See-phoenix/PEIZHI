@@ -41,6 +41,9 @@ async def _serialize_parts(
                 part=PartOut.model_validate(part),
                 effective_price=agg.effective_price,
                 price_source=agg.effective_source,
+                price_as_of=agg.price_as_of,
+                price_stale=agg.price_stale,
+                price_age_hours=agg.price_age_hours,
                 buy_links=buy_links_dict(part),
                 live_offers=[o.model_dump(mode="json") for o in agg.live_offers],
             )

@@ -6,7 +6,12 @@ from sqlalchemy.orm import Session
 
 from app.domain.compat import estimate_system_wattage, recommended_psu_wattage, validate_build
 from app.models import Part
+from contextvars import ContextVar
+
+from app.domain.pricebook import PriceBook, load_price_book, summarize_price_book
 from app.schemas import CompatIssue, SuggestRequest
+
+_PRICE_BOOK: ContextVar[PriceBook | None] = ContextVar("price_book", default=None)
 
 
 CATEGORIES = ["cpu", "motherboard", "gpu", "memory", "storage", "cooler", "psu", "case"]
@@ -67,12 +72,22 @@ def _tier(part: Part) -> int:
     return int(t) if isinstance(t, int) else 0
 
 
+def _unit(part: Part | None) -> float:
+    """Effective unit price from PriceBook context (verified > catalog)."""
+    if not part:
+        return 0.0
+    book = _PRICE_BOOK.get()
+    if book is not None:
+        return book.of(part)
+    return float(part.list_price)
+
+
 def _price(part: Part | None) -> float:
-    return float(part.list_price) if part else 0.0
+    return _unit(part)
 
 
 def _total(selected: dict[str, Part]) -> float:
-    return sum(p.list_price for p in selected.values())
+    return sum(_unit(p) for p in selected.values())
 
 
 def _parts_by_category(db: Session, category: str) -> list[Part]:
@@ -83,18 +98,18 @@ def _pick_under(candidates: list[Part], budget: float, *, allow_cheapest_fallbac
     """Prefer the most expensive part that still fits the slice."""
     if not candidates:
         return None
-    under = [p for p in candidates if p.list_price <= budget]
+    under = [p for p in candidates if _unit(p) <= budget]
     if under:
-        return max(under, key=lambda p: (p.list_price, _tier(p)))
+        return max(under, key=lambda p: (_unit(p), _tier(p)))
     if allow_cheapest_fallback:
-        return min(candidates, key=lambda p: p.list_price)
+        return min(candidates, key=lambda p: _unit(p))
     return None
 
 
 def _pick_cheapest(candidates: list[Part]) -> Part | None:
     if not candidates:
         return None
-    return min(candidates, key=lambda p: (p.list_price, -_tier(p)))
+    return min(candidates, key=lambda p: (_unit(p), -_tier(p)))
 
 
 def _resolve_locks(db: Session, req: SuggestRequest, notes: list[str]) -> dict[str, Part]:
@@ -273,7 +288,7 @@ def _assemble_platform(
         and req.budget >= 10000
     ):
         x3d = next((c for c in _parts_by_category(db, "cpu") if "x3d" in c.id), None)
-        if x3d and x3d.list_price <= budgets.get("cpu", 0) * 1.15:
+        if x3d and _unit(x3d) <= budgets.get("cpu", 0) * 1.15:
             selected["cpu"] = x3d
     choose("cpu", cpus)
 
@@ -342,7 +357,7 @@ def _candidate_upgrades(
     else:
         pool = all_parts
 
-    return [p for p in pool if p.id != current.id and p.list_price > current.list_price]
+    return [p for p in pool if p.id != current.id and _unit(p) > _unit(current)]
 
 
 def _spend_leftover(
@@ -367,7 +382,7 @@ def _spend_leftover(
             options = _candidate_upgrades(db, selected, cat)
             affordable = []
             for part in options:
-                delta = part.list_price - _price(selected[cat])
+                delta = _unit(part) - _unit(selected[cat])
                 if delta <= remaining + 0.01:
                     trial = dict(selected)
                     trial[cat] = part
@@ -383,7 +398,7 @@ def _spend_leftover(
                     affordable.append(part)
             if not affordable:
                 continue
-            best = max(affordable, key=lambda p: (p.list_price, _tier(p)))
+            best = max(affordable, key=lambda p: (_unit(p), _tier(p)))
             selected[cat] = best
             upgraded.append(cat)
             progressed = True
@@ -419,7 +434,7 @@ def _downgrade_to_fit(
             cheaper = [
                 p
                 for p in _parts_by_category(db, cat)
-                if p.list_price < selected[cat].list_price and p.id not in skipped
+                if _unit(p) < _unit(selected[cat]) and p.id not in skipped
             ]
             if cat == "cpu" and need_igpu:
                 cheaper = [p for p in cheaper if bool(p.specs.get("igpu"))]
@@ -438,7 +453,7 @@ def _downgrade_to_fit(
                 cheaper = _filter_psus(cheaper, recommended_psu_wattage(watt))
             if not cheaper:
                 break
-            candidate = max(cheaper, key=lambda p: p.list_price)
+            candidate = max(cheaper, key=lambda p: _unit(p))
             trial = dict(selected)
             trial[cat] = candidate
             if cat in {"cpu", "motherboard", "gpu", "case", "cooler", "psu", "memory"} and not _compat_ok(
@@ -477,7 +492,7 @@ def _repair_compat(db: Session, selected: dict[str, Part], locked: set[str], not
         if "psu_insufficient" in codes and "psu" not in locked:
             bigger = _filter_psus(_parts_by_category(db, "psu"), rec_w)
             if bigger:
-                selected["psu"] = min(bigger, key=lambda p: p.list_price)
+                selected["psu"] = min(bigger, key=lambda p: _unit(p))
                 notes.append("已升级电源以满足功耗")
         if (
             "cooler_socket" in codes or "cooler_tdp_low" in codes or "cooler_too_tall" in codes
@@ -495,6 +510,17 @@ def _repair_compat(db: Session, selected: dict[str, Part], locked: set[str], not
 
 def suggest_build(db: Session, req: SuggestRequest) -> SuggestResult:
     notes: list[str] = []
+    book = load_price_book(db)
+    token = _PRICE_BOOK.set(book)
+    try:
+        return _suggest_build_inner(db, req, notes, book)
+    finally:
+        _PRICE_BOOK.reset(token)
+
+
+def _suggest_build_inner(
+    db: Session, req: SuggestRequest, notes: list[str], book: PriceBook
+) -> SuggestResult:
     weights = BUDGET_WEIGHTS[req.use_case]
     budgets = {k: req.budget * v for k, v in weights.items()}
 
@@ -503,7 +529,7 @@ def suggest_build(db: Session, req: SuggestRequest) -> SuggestResult:
 
     # Reclaim leftover from locked parts into unlocked category slices (initial hint only).
     for cat, part in list(selected.items()):
-        leftover = max(0.0, budgets.get(cat, 0) - part.list_price)
+        leftover = max(0.0, budgets.get(cat, 0) - _unit(part))
         if leftover <= 0:
             continue
         unlockable = [c for c in CATEGORIES if c not in locked_cats and c in budgets]
@@ -549,9 +575,9 @@ def suggest_build(db: Session, req: SuggestRequest) -> SuggestResult:
         remaining = req.budget - _total(selected_floor)
         # Keep a tiny reserve for rounding; prefer fitting under remaining.
         gpu = _pick_under(gpus, max(remaining, budgets.get("gpu", 0)), allow_cheapest_fallback=False)
-        if gpu is None and remaining >= min((p.list_price for p in gpus), default=remaining + 1):
+        if gpu is None and remaining >= min((_unit(p) for p in gpus), default=remaining + 1):
             gpu = _pick_cheapest(gpus)
-        if gpu and _total(selected_floor) + gpu.list_price <= req.budget * 1.08:
+        if gpu and _total(selected_floor) + _unit(gpu) <= req.budget * 1.08:
             selected_floor["gpu"] = gpu
             # Case/PSU may need a quick refresh for the new GPU.
             if "case" not in locked_cats:
@@ -589,9 +615,9 @@ def suggest_build(db: Session, req: SuggestRequest) -> SuggestResult:
             better_cpus = [
                 p
                 for p in _parts_by_category(db, "cpu")
-                if p.list_price > cpu.list_price
+                if _unit(p) > _unit(cpu)
                 and (not bool(p.specs.get("igpu")) or int(p.specs.get("cores", 0)) >= 6)
-                and p.list_price - cpu.list_price <= (req.budget - _total(selected)) + 0.01
+                and _unit(p) - _unit(cpu) <= (req.budget - _total(selected)) + 0.01
             ]
             mb = selected.get("motherboard")
             better_cpus = [
@@ -600,7 +626,7 @@ def suggest_build(db: Session, req: SuggestRequest) -> SuggestResult:
                 if not mb or mb.specs.get("socket") == p.specs.get("socket")
             ]
             if better_cpus:
-                pick = min(better_cpus, key=lambda p: p.list_price)
+                pick = min(better_cpus, key=lambda p: _unit(p))
                 trial = dict(selected)
                 trial["cpu"] = pick
                 if _compat_ok(trial):
@@ -628,16 +654,24 @@ def suggest_build(db: Session, req: SuggestRequest) -> SuggestResult:
     watt = estimate_system_wattage(parts_list)
     rec_w = recommended_psu_wattage(watt)
     total = _total(selected)
-
+    summary = summarize_price_book(book)
+    if summary["verified"]:
+        notes.append(
+            f"选型按有效价计算（权威价 {summary['verified']} 项，目录价 {summary['catalog']} 项）"
+        )
+    if summary["stale_verified"]:
+        notes.append(
+            f"其中 {summary['stale_verified']} 项权威价超过 {book.stale_after_hours:.0f} 小时，建议重新核对纠价"
+        )
     if total > req.budget * 1.05:
         notes.append(
-            f"配置目录总价约 ¥{total:.0f}，仍略超预算 "
-            f"（目录最低可组装平台约 ¥{floor_no_gpu:.0f}）；可降低自选锁定或提高预算"
+            f"配置有效总价约 ¥{total:.0f}，仍略超预算 "
+            f"（最低可组装平台约 ¥{floor_no_gpu:.0f}）；可降低自选锁定或提高预算"
         )
     elif total < req.budget * 0.85:
-        notes.append(f"配置目录总价约 ¥{total:.0f}，预算仍有余量；目录高端件可能已到顶")
+        notes.append(f"配置有效总价约 ¥{total:.0f}，预算仍有余量；目录高端件可能已到顶")
     else:
-        notes.append(f"配置目录总价约 ¥{total:.0f}，约占用预算 {total / req.budget * 100:.0f}%")
+        notes.append(f"配置有效总价约 ¥{total:.0f}，约占用预算 {total / req.budget * 100:.0f}%")
 
     if "gpu" not in selected:
         cpu = selected.get("cpu")

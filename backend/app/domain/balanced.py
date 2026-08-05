@@ -20,6 +20,7 @@ from app.domain.recommend import (
     _repair_compat,
     _resolve_locks,
     _total,
+    _unit,
 )
 from app.models import Part
 from app.schemas import CompatIssue, SuggestRequest
@@ -40,8 +41,8 @@ def _gpu_perf(part: Part | None) -> float:
     tier = part.specs.get("tier")
     if isinstance(tier, int) and tier > 0:
         return float(tier)
-    # price fallback
-    price = float(part.list_price)
+    # price fallback (effective unit when PriceBook is active)
+    price = _unit(part)
     if price < 2200:
         return 1.0
     if price < 3500:
@@ -170,12 +171,12 @@ def _supporting_parts(
     if "motherboard" not in selected:
         mbs = _filter_mbs(_parts_by_category(db, "motherboard"), cpu)
         if quality == "performance":
-            selected["motherboard"] = max(mbs, key=lambda p: p.list_price) if mbs else None  # type: ignore
+            selected["motherboard"] = max(mbs, key=_unit) if mbs else None  # type: ignore
         elif quality == "value":
             selected["motherboard"] = _pick_cheapest(mbs)  # type: ignore
         else:
             # mid
-            ranked = sorted(mbs, key=lambda p: p.list_price)
+            ranked = sorted(mbs, key=_unit)
             selected["motherboard"] = ranked[len(ranked) // 2] if ranked else None  # type: ignore
         mb = selected.get("motherboard")
 
@@ -184,11 +185,11 @@ def _supporting_parts(
             _parts_by_category(db, "memory"), cpu, mb, prefer_32=prefer_32_ram
         )
         if quality == "performance":
-            selected["memory"] = max(rams, key=lambda p: (int(p.specs.get("capacity_gb", 0)), p.list_price))
+            selected["memory"] = max(rams, key=lambda p: (int(p.specs.get("capacity_gb", 0)), _unit(p)))
         elif quality == "value":
             selected["memory"] = _pick_cheapest(rams)  # type: ignore
         else:
-            ranked = sorted(rams, key=lambda p: p.list_price)
+            ranked = sorted(rams, key=_unit)
             selected["memory"] = ranked[min(len(ranked) - 1, max(0, len(ranked) // 2))] if ranked else None  # type: ignore
 
     if "storage" not in selected:
@@ -204,7 +205,7 @@ def _supporting_parts(
     if "case" not in selected:
         cases = _filter_cases(_parts_by_category(db, "case"), mb, gpu)
         if quality == "performance":
-            selected["case"] = max(cases, key=lambda p: p.list_price) if cases else None  # type: ignore
+            selected["case"] = max(cases, key=_unit) if cases else None  # type: ignore
         else:
             selected["case"] = _pick_cheapest(cases)  # type: ignore
 
@@ -306,7 +307,7 @@ def _finalize_for_use_case(
         return None
 
     notes = list(base_reasons) + match_reasons + notes_buf
-    notes.append(f"目录参考总价约 ¥{_total(selected):.0f}（无预算·性能匹配）")
+    notes.append(f"有效总价约 ¥{_total(selected):.0f}（无预算·性能匹配，权威价优先）")
     result = SuggestResult(
         parts=parts,
         issues=issues,
@@ -325,6 +326,20 @@ def _finalize_for_use_case(
 
 def suggest_balanced_builds(db: Session, req: SuggestRequest, limit: int = 3) -> list[BalancedOption]:
     """No-budget recommender: match performance, avoid severe bottlenecks, return multiple options."""
+    from app.domain.pricebook import load_price_book
+    from app.domain.recommend import _PRICE_BOOK
+
+    book = load_price_book(db)
+    token = _PRICE_BOOK.set(book)
+    try:
+        return _suggest_balanced_inner(db, req, limit, book)
+    finally:
+        _PRICE_BOOK.reset(token)
+
+
+def _suggest_balanced_inner(
+    db: Session, req: SuggestRequest, limit: int, book
+) -> list[BalancedOption]:
     notes: list[str] = []
     locked_parts = _resolve_locks(db, req, notes)
     locked = set(locked_parts.keys())
@@ -356,7 +371,7 @@ def suggest_balanced_builds(db: Session, req: SuggestRequest, limit: int = 3) ->
             if quality == "performance":
                 pick = max(candidates[:5], key=_cpu_perf) if candidates else None
             elif quality == "value":
-                pick = min(candidates[:5], key=lambda p: p.list_price) if candidates else None
+                pick = min(candidates[:5], key=_unit) if candidates else None
             else:
                 pick = candidates[0] if candidates else None
             if pick:
@@ -378,7 +393,7 @@ def suggest_balanced_builds(db: Session, req: SuggestRequest, limit: int = 3) ->
                     if quality == "performance":
                         pick = max(candidates[:6], key=_gpu_perf)
                     elif quality == "value":
-                        pick = min(candidates[:6], key=lambda p: p.list_price)
+                        pick = min(candidates[:6], key=_unit)
                     else:
                         pick = candidates[0]
                     selected["gpu"] = pick
@@ -388,7 +403,7 @@ def suggest_balanced_builds(db: Session, req: SuggestRequest, limit: int = 3) ->
             # Pick anchor GPU band by profile + use case
             if req.use_case == "office" and quality == "value":
                 igpus = [c for c in cpus if bool(c.specs.get("igpu"))]
-                selected["cpu"] = min(igpus or cpus, key=lambda p: p.list_price)
+                selected["cpu"] = min(igpus or cpus, key=_unit)
                 reasons.append("办公核显起步")
             else:
                 if req.use_case == "office":
@@ -399,11 +414,11 @@ def suggest_balanced_builds(db: Session, req: SuggestRequest, limit: int = 3) ->
                     band = {"value": 2, "balanced": 3, "performance": 5}[quality]
                 band_gpus = [g for g in gpus if abs(_gpu_perf(g) - band) <= 0.6] or gpus
                 if quality == "value":
-                    gpu = min(band_gpus, key=lambda p: p.list_price)
+                    gpu = min(band_gpus, key=_unit)
                 elif quality == "performance":
-                    gpu = max(band_gpus, key=lambda p: (_gpu_perf(p), -p.list_price))
+                    gpu = max(band_gpus, key=lambda p: (_gpu_perf(p), -_unit(p)))
                 else:
-                    gpu = sorted(band_gpus, key=lambda p: p.list_price)[len(band_gpus) // 2]
+                    gpu = sorted(band_gpus, key=_unit)[len(band_gpus) // 2]
                 selected["gpu"] = gpu
                 cpu_cands = _target_cpu_for_gpu(_gpu_perf(gpu), cpus, req.use_case)
                 if not cpu_cands:
@@ -411,7 +426,7 @@ def suggest_balanced_builds(db: Session, req: SuggestRequest, limit: int = 3) ->
                 if quality == "performance":
                     cpu = max(cpu_cands[:5], key=_cpu_perf)
                 elif quality == "value":
-                    cpu = min(cpu_cands[:5], key=lambda p: p.list_price)
+                    cpu = min(cpu_cands[:5], key=_unit)
                 else:
                     cpu = cpu_cands[0]
                 selected["cpu"] = cpu
@@ -457,7 +472,7 @@ def suggest_balanced_builds(db: Session, req: SuggestRequest, limit: int = 3) ->
             band_gpus = [g for g in gpus if abs(_gpu_perf(g) - band) < 0.1]
             if not band_gpus:
                 continue
-            gpu = min(band_gpus, key=lambda p: p.list_price)
+            gpu = min(band_gpus, key=_unit)
             cands = _target_cpu_for_gpu(_gpu_perf(gpu), cpus, req.use_case)
             if not cands:
                 continue

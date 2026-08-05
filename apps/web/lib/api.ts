@@ -24,6 +24,9 @@ export interface BuildPartItem {
   part: Part;
   effective_price: number;
   price_source: string;
+  price_as_of?: string | null;
+  price_stale?: boolean;
+  price_age_hours?: number | null;
   buy_links: Record<string, string>;
   live_offers: Array<Record<string, unknown>>;
 }
@@ -80,6 +83,9 @@ export interface AggregatedPrice {
   live_best_price: number | null;
   effective_price: number;
   effective_source: string;
+  price_as_of?: string | null;
+  price_stale?: boolean;
+  price_age_hours?: number | null;
   buy_links: Array<{ platform: string; label: string; url: string }>;
   live_offers: Array<{
     platform: string;
