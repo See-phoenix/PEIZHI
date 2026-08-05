@@ -7,7 +7,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
-import { BorderBeam } from "@/components/magicui/border-beam";
 
 type PlatformOption = { value: string; label: string };
 
@@ -78,8 +77,7 @@ export function CorrectionDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="overflow-hidden">
-        <BorderBeam size={80} duration={8} colorFrom="#22d3ee" colorTo="#2dd4bf" />
+      <DialogContent>
         <DialogHeader>
           <DialogTitle>纠价 · {part?.name}</DialogTitle>
         </DialogHeader>
@@ -94,6 +92,7 @@ export function CorrectionDialog({
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               required
+              className="price-mono"
             />
           </div>
           <div className="space-y-1.5">
@@ -126,10 +125,10 @@ export function CorrectionDialog({
               rows={2}
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              className="flex w-full rounded-lg border border-white/10 bg-slate-950/60 px-3 py-2 text-sm text-slate-100 outline-none transition focus:border-cyan-400/40 focus:ring-2 focus:ring-cyan-400/20"
+              className="flex w-full rounded-md border border-[var(--color-edge)] bg-[var(--color-bay)]/70 px-3 py-2 text-sm text-[var(--color-ink)] outline-none transition focus:border-[var(--color-copper)]/50 focus:ring-2 focus:ring-[var(--color-copper)]/20"
             />
           </div>
-          {error && <p className="text-sm text-rose-400">{error}</p>}
+          {error && <p className="text-sm text-[var(--color-danger)]">{error}</p>}
           <div className="flex gap-2 pt-1">
             <Button type="submit" disabled={submitting}>
               {submitting ? "提交中…" : "提交纠价"}

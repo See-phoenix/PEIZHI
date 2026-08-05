@@ -110,6 +110,26 @@ cd backend
 python -m pytest tests/ -q
 ```
 
+## Agent Skills（Cursor）
+
+项目已引入前端设计相关 Agent Skills（`SKILL.md` 规范），安装在 `.agents/skills/`，Cursor 会按任务自动匹配加载：
+
+| Skill | 来源 | 用途 |
+|------|------|------|
+| `design-taste-frontend` | [Taste Skill](https://github.com/Leonxlnx/taste-skill) | 反模板化落地页 / 作品集 / 改版（v2） |
+| `web-design-engineer` 等 | [garden-skills](https://github.com/ConardLi/garden-skills) | 网页视觉工程、演示、文章、出图、知识库检索 |
+| `frontend-design` | [anthropics/skills](https://github.com/anthropics/skills)（Claude 官方） | 有辨识度的前端审美与排版指引 |
+
+版本锁定见根目录 `skills-lock.json`。更新示例：
+
+```bash
+npx skills update -p -y
+# 或按包重装
+npx skills add Leonxlnx/taste-skill --skill design-taste-frontend -y -a cursor --copy
+npx skills add ConardLi/garden-skills --skill '*' -y -a cursor --copy
+npx skills add anthropics/skills --skill frontend-design -y -a cursor --copy
+```
+
 ## License
 
 MIT

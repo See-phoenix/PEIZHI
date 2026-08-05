@@ -1,15 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import {
-  AlertTriangle,
-  Cpu,
-  Eraser,
-  Lock,
-  ShoppingCart,
-  Sparkles,
-  Zap,
-} from "lucide-react";
+import { AlertTriangle, Eraser, Lock, ShoppingCart } from "lucide-react";
 import {
   API_BASE,
   Part,
@@ -28,11 +20,7 @@ import { CorrectionDialog } from "@/components/correction-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
-import { AnimatedShinyText } from "@/components/magicui/animated-shiny-text";
-import { BlurFade } from "@/components/magicui/blur-fade";
-import { BorderBeam } from "@/components/magicui/border-beam";
 import { NumberTicker } from "@/components/magicui/number-ticker";
-import { ShineBorder } from "@/components/magicui/shine-border";
 import { cn } from "@/lib/utils";
 
 const CATEGORY_LABEL: Record<string, string> = {
@@ -115,9 +103,7 @@ export default function HomePage() {
   const view: BuildOption | null = useMemo(() => {
     if (!result) return null;
     const alts = result.alternatives && result.alternatives.length > 0 ? result.alternatives : null;
-    if (alts) {
-      return alts[Math.min(activeAlt, alts.length - 1)];
-    }
+    if (alts) return alts[Math.min(activeAlt, alts.length - 1)];
     return {
       label: result.mode === "balanced" ? "主推" : "预算方案",
       score: 0,
@@ -176,36 +162,29 @@ export default function HomePage() {
   }
 
   return (
-    <main className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6 sm:py-8">
-      <BlurFade delay={0.05} className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="mb-1 text-xs font-semibold uppercase tracking-[0.22em] text-cyan-400/80">
-            <AnimatedShinyText className="!inline tracking-[0.22em]">PC Builder Desk</AnimatedShinyText>
-          </p>
-          <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold tracking-tight text-slate-50 sm:text-4xl">
-            装机工作台
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-400">
-            可填预算智能分配，也可不填预算按性能匹配出多套对比。自选锁定后自动补齐并兼容校验。目录含{" "}
-            <span className="text-cyan-300">{gpuCount}</span> 款显卡；选型使用权威价优先的有效价。
-          </p>
-        </div>
-        <div className="flex items-center gap-2 text-xs text-slate-500">
-          <span className="inline-flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse-soft" />
-          API {API_BASE.replace(/^https?:\/\//, "")}
-        </div>
-      </BlurFade>
+    <main className="mx-auto w-full max-w-[1380px] px-4 py-7 sm:px-6 sm:py-9">
+      <section className="animate-bay-in mb-8">
+        <p className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--color-mute)]">
+          <span className="led-dot" />
+          DIY Parts Bay · {gpuCount} GPU in catalog
+        </p>
+        <h1 className="max-w-3xl font-[family-name:var(--font-display)] text-4xl font-extrabold tracking-tight text-[var(--color-ink)] sm:text-5xl">
+          <span className="text-[var(--color-copper-bright)]">配智</span>
+          <span className="text-[var(--color-mute)]"> / </span>
+          装机配件台
+        </h1>
+        <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-[var(--color-mute)]">
+          填预算智能分配，或不填预算按性能匹配多套对比。自选锁定后自动补齐，选型优先权威有效价。
+        </p>
+        <div className="copper-rule mt-6 max-w-xl" />
+      </section>
 
-      <div className="grid gap-5 lg:grid-cols-[300px_minmax(0,1fr)_260px]">
-        <BlurFade delay={0.1} className="space-y-4 lg:sticky lg:top-20 lg:self-start">
+      <div className="grid gap-5 lg:grid-cols-[290px_minmax(0,1fr)_250px]">
+        <aside className="animate-bay-in space-y-4 [animation-delay:60ms] lg:sticky lg:top-24 lg:self-start">
           <Card>
-            <ShineBorder shineColor={["#22d3ee", "#2dd4bf", "#67e8f9"]} duration={14} />
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-cyan-300" />
-                需求参数
-              </CardTitle>
-              <CardDescription>预算、用途、分辨率决定自动选型权重</CardDescription>
+              <CardTitle>需求参数</CardTitle>
+              <CardDescription>预算 · 用途 · 分辨率 · 锁定</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={onSubmit} className="space-y-4">
@@ -220,17 +199,18 @@ export default function HomePage() {
                     onChange={(e) => setBudget(Number(e.target.value))}
                     disabled={noBudget}
                     required={!noBudget}
+                    className="price-mono"
                   />
                 </div>
 
-                <label className="flex cursor-pointer items-start gap-2.5 rounded-lg border border-white/5 bg-slate-950/40 p-3">
+                <label className="flex cursor-pointer items-start gap-2.5 rounded-md border border-[var(--color-edge)] bg-[var(--color-bay)]/50 p-3">
                   <Checkbox
                     checked={noBudget}
                     onCheckedChange={(v) => setNoBudget(v === true)}
                     className="mt-0.5"
                   />
-                  <span className="text-xs leading-relaxed text-slate-400">
-                    不填预算 · 按性能匹配出多套对比（防严重拖后腿）
+                  <span className="text-xs leading-relaxed text-[var(--color-mute)]">
+                    不填预算 · 按性能匹配多套对比
                   </span>
                 </label>
 
@@ -246,6 +226,7 @@ export default function HomePage() {
                     <option value="content">内容创作</option>
                   </Select>
                 </div>
+
                 <div className="space-y-1.5">
                   <Label htmlFor="resolution">分辨率</Label>
                   <Select
@@ -259,15 +240,15 @@ export default function HomePage() {
                   </Select>
                 </div>
 
-                <div className="border-t border-white/5 pt-4">
+                <div className="border-t border-[var(--color-edge)] pt-4">
                   <div className="mb-3 flex items-center justify-between">
-                    <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.08em] text-slate-400">
+                    <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--color-mute)]">
                       <Lock className="h-3.5 w-3.5" />
                       自选锁定
                     </p>
                     <Badge variant="muted">{lockCount} 项</Badge>
                   </div>
-                  <div className="max-h-[320px] space-y-3 overflow-y-auto pr-1">
+                  <div className="max-h-[300px] space-y-3 overflow-y-auto pr-1">
                     {LOCKABLE.map((cat) => (
                       <div key={cat} className="space-y-1.5">
                         <Label htmlFor={`lock-${cat}`}>
@@ -291,23 +272,20 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                <label className="flex cursor-pointer items-start gap-2.5 rounded-lg border border-white/5 bg-slate-950/40 p-3">
+                <label className="flex cursor-pointer items-start gap-2.5 rounded-md border border-[var(--color-edge)] bg-[var(--color-bay)]/50 p-3">
                   <Checkbox
                     checked={includeLive}
                     onCheckedChange={(v) => setIncludeLive(v === true)}
                     className="mt-0.5"
                   />
-                  <span className="text-xs leading-relaxed text-slate-400">
-                    拉取 SerpApi 实时搜索价（需后端配置 KEY）
+                  <span className="text-xs leading-relaxed text-[var(--color-mute)]">
+                    拉取实时搜索价（需配置 SerpApi）
                   </span>
                 </label>
 
                 <div className="flex flex-col gap-2">
-                  <Button type="submit" size="lg" disabled={loading} className="relative w-full overflow-hidden">
+                  <Button type="submit" size="lg" disabled={loading} className="w-full">
                     {loading ? "生成中…" : "生成配置单"}
-                    {!loading && (
-                      <BorderBeam size={60} duration={5} colorFrom="#ecfeff" colorTo="#22d3ee" borderWidth={1.5} />
-                    )}
                   </Button>
                   <Button type="button" variant="secondary" className="w-full" onClick={() => setLocks({})}>
                     <Eraser className="h-3.5 w-3.5" />
@@ -317,16 +295,16 @@ export default function HomePage() {
               </form>
             </CardContent>
           </Card>
-        </BlurFade>
+        </aside>
 
-        <BlurFade delay={0.18} className="min-w-0 space-y-4">
+        <section className="animate-bay-in min-w-0 space-y-4 [animation-delay:120ms]">
           {(error || okMsg) && (
             <div
               className={cn(
-                "rounded-xl border px-4 py-3 text-sm",
+                "rounded-lg border px-4 py-3 text-sm",
                 error
-                  ? "border-rose-400/30 bg-rose-500/10 text-rose-200"
-                  : "border-emerald-400/30 bg-emerald-500/10 text-emerald-200"
+                  ? "border-[var(--color-danger)]/35 bg-[var(--color-danger)]/10 text-[#f0b4ae]"
+                  : "border-[var(--color-solder)]/35 bg-[var(--color-solder)]/10 text-[#9fd9ce]"
               )}
             >
               {error || okMsg}
@@ -334,44 +312,43 @@ export default function HomePage() {
           )}
 
           {!result && !loading && (
-            <Card className="border-dashed">
-              <CardContent className="flex flex-col items-center justify-center gap-3 py-16 text-center">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-400/10 text-cyan-300">
-                  <Cpu className="h-7 w-7" />
-                </div>
-                <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold text-slate-100">
-                  还没有配置单
-                </h2>
-                <p className="max-w-sm text-sm text-slate-400">
-                  在左侧设定预算或开启无预算匹配，点击「生成配置单」后，这里会列出完整 BOM。
-                </p>
-              </CardContent>
-            </Card>
+            <div className="bay-panel bay-sheet flex flex-col items-start justify-center gap-4 rounded-xl px-6 py-16 sm:px-10">
+              <p className="font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--color-ink)]">
+                配置单还是空的
+              </p>
+              <p className="max-w-md text-sm leading-relaxed text-[var(--color-mute)]">
+                左侧设定预算或开启无预算匹配，点「生成配置单」后，这里会列出完整 BOM 与购买链接。
+              </p>
+              <div className="copper-rule w-40" />
+            </div>
           )}
 
           {loading && (
             <Card>
               <CardContent className="space-y-3 py-8">
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="h-16 animate-pulse rounded-xl bg-white/5" />
+                  <div
+                    key={i}
+                    className="h-14 animate-pulse rounded-md bg-[var(--color-edge)]/40"
+                    style={{ animationDelay: `${i * 80}ms` }}
+                  />
                 ))}
               </CardContent>
             </Card>
           )}
 
           {view && !loading && (
-            <Card>
-              <BorderBeam size={120} duration={10} delay={2} colorFrom="#22d3ee" colorTo="#67e8f9" />
-              <CardHeader className="space-y-3 border-b border-white/5">
-                <div className="flex flex-row items-center justify-between space-y-0">
+            <Card className="overflow-hidden">
+              <CardHeader className="space-y-3 border-b border-[var(--color-edge)]">
+                <div className="flex items-start justify-between gap-3">
                   <div>
-                    <CardTitle>配置清单</CardTitle>
+                    <CardTitle>配置清单 · BOM</CardTitle>
                     <CardDescription>
-                      {view.items.length} 个配件 · {view.label}
+                      {view.items.length} 件 · {view.label}
                       {result?.mode === "balanced" ? " · 无预算匹配" : ""}
                     </CardDescription>
                   </div>
-                  <Badge variant="default">BOM</Badge>
+                  <Badge variant="default">有效价</Badge>
                 </div>
                 {alts && (
                   <div className="flex flex-wrap gap-2">
@@ -384,7 +361,7 @@ export default function HomePage() {
                         onClick={() => setActiveAlt(idx)}
                       >
                         {alt.label}
-                        <span className="opacity-80">· ¥{Math.round(alt.total_effective)}</span>
+                        <span className="price-mono opacity-80">¥{Math.round(alt.total_effective)}</span>
                       </Button>
                     ))}
                   </div>
@@ -392,96 +369,89 @@ export default function HomePage() {
                 {view.reasons.length > 0 && (
                   <ul className="space-y-1.5">
                     {view.reasons.map((r) => (
-                      <li key={r} className="rounded-lg bg-cyan-400/5 px-3 py-1.5 text-xs text-cyan-100/90">
+                      <li
+                        key={r}
+                        className="rounded-md border border-[var(--color-copper)]/15 bg-[var(--color-copper)]/5 px-3 py-1.5 text-xs text-[var(--color-aluminum)]"
+                      >
                         {r}
                       </li>
                     ))}
                   </ul>
                 )}
               </CardHeader>
-              <CardContent className="p-0">
-                <ul className="divide-y divide-white/5">
+              <CardContent className="bay-sheet p-0">
+                <ul>
                   {view.items.map((item, idx) => {
                     const locked = locks[item.category] === item.part.id;
                     const asOf = formatAsOf(item.price_as_of);
                     return (
-                      <BlurFade key={item.part.id} delay={0.05 + idx * 0.04} inView>
-                        <li className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-                          <div className="min-w-0 flex-1">
-                            <div className="mb-1 flex flex-wrap items-center gap-2">
-                              <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-                                {CATEGORY_LABEL[item.category] || item.category}
-                              </span>
-                              {locked && <Badge variant="locked">自选锁定</Badge>}
-                              <Badge variant={SOURCE_VARIANT[item.price_source] || "default"}>
-                                {SOURCE_LABEL[item.price_source] || item.price_source}
+                      <li
+                        key={item.part.id}
+                        className="animate-bay-in flex flex-col gap-3 border-b border-[var(--color-edge)]/70 px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+                        style={{ animationDelay: `${80 + idx * 40}ms` }}
+                      >
+                        <div className="min-w-0 flex-1">
+                          <div className="mb-1 flex flex-wrap items-center gap-2">
+                            <span className="price-mono text-[11px] font-semibold uppercase tracking-wider text-[var(--color-mute)]">
+                              {CATEGORY_LABEL[item.category] || item.category}
+                            </span>
+                            {locked && <Badge variant="locked">自选</Badge>}
+                            <Badge variant={SOURCE_VARIANT[item.price_source] || "default"}>
+                              {SOURCE_LABEL[item.price_source] || item.price_source}
+                            </Badge>
+                            {item.price_stale && (
+                              <Badge variant="stale">
+                                价已过期
+                                {item.price_age_hours != null
+                                  ? ` · ${Math.round(item.price_age_hours)}h`
+                                  : ""}
                               </Badge>
-                              {item.price_stale && (
-                                <Badge variant="stale">
-                                  价已过期
-                                  {item.price_age_hours != null ? ` · ${Math.round(item.price_age_hours)}h` : ""}
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="truncate font-medium text-slate-100">{item.part.name}</p>
-                            <p className="mt-0.5 text-xs text-slate-500">
-                              目录参考 ¥{item.part.list_price}
-                              {asOf ? ` · 更新于 ${asOf}` : ""}
-                            </p>
+                            )}
                           </div>
-                          <div className="flex flex-wrap items-center gap-3 sm:justify-end">
-                            <p className="price-mono text-lg font-semibold text-cyan-200">
-                              ¥
-                              <NumberTicker value={Math.round(item.effective_price)} className="text-cyan-200" />
-                            </p>
-                            <div className="flex flex-wrap gap-1.5">
-                              {item.buy_links.jd && (
+                          <p className="truncate font-medium text-[var(--color-ink)]">{item.part.name}</p>
+                          <p className="mt-0.5 text-xs text-[var(--color-mute)]">
+                            目录 ¥{item.part.list_price}
+                            {asOf ? ` · 更新于 ${asOf}` : ""}
+                          </p>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-3 sm:justify-end">
+                          <p className="price-mono text-lg font-semibold text-[var(--color-voltage)]">
+                            ¥
+                            <NumberTicker
+                              value={Math.round(item.effective_price)}
+                              className="text-[var(--color-voltage)]"
+                            />
+                          </p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {(["jd", "tmall", "pdd"] as const).map((key) =>
+                              item.buy_links[key] ? (
                                 <a
-                                  href={item.buy_links.jd}
+                                  key={key}
+                                  href={item.buy_links[key]}
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="inline-flex items-center gap-1 rounded-md bg-white/5 px-2 py-1 text-xs text-slate-300 no-underline hover:bg-white/10 hover:text-white"
+                                  className="inline-flex items-center gap-1 rounded border border-[var(--color-edge)] bg-[var(--color-rail)] px-2 py-1 text-xs text-[var(--color-aluminum)] no-underline hover:border-[var(--color-copper)]/40 hover:text-[var(--color-ink)]"
                                 >
-                                  <ShoppingCart className="h-3 w-3" />
-                                  京东
+                                  {key === "jd" && <ShoppingCart className="h-3 w-3" />}
+                                  {key === "jd" ? "京东" : key === "tmall" ? "天猫" : "拼多多"}
                                 </a>
-                              )}
-                              {item.buy_links.tmall && (
-                                <a
-                                  href={item.buy_links.tmall}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="inline-flex items-center gap-1 rounded-md bg-white/5 px-2 py-1 text-xs text-slate-300 no-underline hover:bg-white/10 hover:text-white"
-                                >
-                                  天猫
-                                </a>
-                              )}
-                              {item.buy_links.pdd && (
-                                <a
-                                  href={item.buy_links.pdd}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="inline-flex items-center gap-1 rounded-md bg-white/5 px-2 py-1 text-xs text-slate-300 no-underline hover:bg-white/10 hover:text-white"
-                                >
-                                  拼多多
-                                </a>
-                              )}
-                            </div>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                setCorrectPart(item.part);
-                                setCorrectPrice(String(Math.round(item.effective_price)));
-                                setCorrectUrl(item.buy_links.jd || item.buy_links.pdd || "");
-                              }}
-                            >
-                              纠价
-                            </Button>
+                              ) : null
+                            )}
                           </div>
-                        </li>
-                      </BlurFade>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setCorrectPart(item.part);
+                              setCorrectPrice(String(Math.round(item.effective_price)));
+                              setCorrectUrl(item.buy_links.jd || item.buy_links.pdd || "");
+                            }}
+                          >
+                            纠价
+                          </Button>
+                        </div>
+                      </li>
                     );
                   })}
                 </ul>
@@ -494,36 +464,24 @@ export default function HomePage() {
               {view.notes.map((n) => (
                 <li
                   key={n}
-                  className="rounded-xl border border-cyan-400/20 bg-cyan-400/5 px-4 py-2.5 text-sm text-cyan-100/90"
+                  className="rounded-lg border border-[var(--color-edge)] bg-[var(--color-panel)]/80 px-4 py-2.5 text-sm text-[var(--color-aluminum)]"
                 >
                   {n}
                 </li>
               ))}
             </ul>
           )}
-        </BlurFade>
+        </section>
 
-        <BlurFade delay={0.26} className="space-y-4 lg:sticky lg:top-20 lg:self-start">
-          <Card className="border-cyan-400/20 bg-gradient-to-b from-cyan-950/40 to-slate-900/70">
-            <BorderBeam size={100} duration={8} colorFrom="#22d3ee" colorTo="#2dd4bf" />
-            <BorderBeam
-              size={100}
-              duration={8}
-              delay={4}
-              reverse
-              colorFrom="#67e8f9"
-              colorTo="#a5f3fc"
-            />
+        <aside className="animate-bay-in space-y-4 [animation-delay:180ms] lg:sticky lg:top-24 lg:self-start">
+          <Card className="border-[var(--color-copper)]/25">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Zap className="h-4 w-4 text-cyan-300" />
-                总览
-              </CardTitle>
+              <CardTitle className="text-[var(--color-voltage)]">总览</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <p className="text-xs uppercase tracking-wider text-slate-400">有效总价</p>
-                <p className="price-mono mt-1 text-3xl font-bold text-slate-50">
+                <p className="text-[11px] uppercase tracking-[0.14em] text-[var(--color-mute)]">有效总价</p>
+                <p className="price-mono mt-1 text-3xl font-bold text-[var(--color-ink)]">
                   ¥
                   {view ? (
                     <NumberTicker value={Math.round(view.total_effective)} className="text-3xl font-bold" />
@@ -531,18 +489,18 @@ export default function HomePage() {
                     "—"
                   )}
                 </p>
-                <p className="mt-1 text-xs text-slate-500">
+                <p className="mt-1 text-xs text-[var(--color-mute)]">
                   目录合计 ¥{view ? Math.round(view.total_catalog) : "—"}
                 </p>
                 {staleCount > 0 && (
-                  <p className="mt-2 text-xs text-orange-300">
-                    {staleCount} 项权威价超过 72 小时，建议纠价更新
+                  <p className="mt-2 text-xs text-[var(--color-warn)]">
+                    {staleCount} 项权威价超过 72 小时，建议纠价
                   </p>
                 )}
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <div className="rounded-xl bg-slate-950/50 p-3">
-                  <p className="text-[11px] text-slate-500">预估功耗</p>
+                <div className="rounded-md border border-[var(--color-edge)] bg-[var(--color-bay)]/60 p-3">
+                  <p className="text-[11px] text-[var(--color-mute)]">预估功耗</p>
                   <p className="price-mono mt-1 text-base font-semibold">
                     {view ? (
                       <>
@@ -553,8 +511,8 @@ export default function HomePage() {
                     )}
                   </p>
                 </div>
-                <div className="rounded-xl bg-slate-950/50 p-3">
-                  <p className="text-[11px] text-slate-500">建议电源</p>
+                <div className="rounded-md border border-[var(--color-edge)] bg-[var(--color-bay)]/60 p-3">
+                  <p className="text-[11px] text-[var(--color-mute)]">建议电源</p>
                   <p className="price-mono mt-1 text-base font-semibold">
                     {view ? (
                       <>
@@ -571,22 +529,25 @@ export default function HomePage() {
                   刷新配置
                 </Button>
               )}
+              <p className="text-[10px] tracking-wide text-[var(--color-mute)]">
+                API {API_BASE.replace(/^https?:\/\//, "")}
+              </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-sm">
-                <AlertTriangle className="h-4 w-4 text-amber-300" />
+                <AlertTriangle className="h-4 w-4 text-[var(--color-voltage)]" />
                 兼容与提示
               </CardTitle>
             </CardHeader>
             <CardContent>
               {!view && (
-                <p className="text-sm text-slate-500">生成后显示插座、供电、机箱等兼容问题。</p>
+                <p className="text-sm text-[var(--color-mute)]">生成后显示插座、供电、机箱等兼容问题。</p>
               )}
               {view && view.issues.length === 0 && (
-                <p className="rounded-lg bg-emerald-400/10 px-3 py-2 text-sm text-emerald-300">
+                <p className="rounded-md bg-[var(--color-solder)]/10 px-3 py-2 text-sm text-[var(--color-solder)]">
                   未发现严重兼容问题
                 </p>
               )}
@@ -596,10 +557,10 @@ export default function HomePage() {
                     <li
                       key={`${i.code}-${i.message}`}
                       className={cn(
-                        "rounded-lg px-3 py-2 text-xs leading-relaxed",
-                        i.severity === "error" && "bg-rose-500/15 text-rose-200",
-                        i.severity === "warning" && "bg-amber-500/15 text-amber-100",
-                        i.severity === "info" && "bg-cyan-500/10 text-cyan-100"
+                        "rounded-md px-3 py-2 text-xs leading-relaxed",
+                        i.severity === "error" && "bg-[var(--color-danger)]/15 text-[#f0b4ae]",
+                        i.severity === "warning" && "bg-[var(--color-warn)]/15 text-[#f0c4a8]",
+                        i.severity === "info" && "bg-[var(--color-solder)]/10 text-[#9fd9ce]"
                       )}
                     >
                       <span className="font-semibold uppercase">[{i.severity}]</span> {i.message}
@@ -609,7 +570,7 @@ export default function HomePage() {
               )}
             </CardContent>
           </Card>
-        </BlurFade>
+        </aside>
       </div>
 
       <CorrectionDialog
@@ -631,10 +592,9 @@ export default function HomePage() {
           setOkMsg(msg);
           setCorrectPart(null);
           try {
-            const data = await suggestBuild(buildPayload());
-            setResult(data);
+            setResult(await suggestBuild(buildPayload()));
           } catch {
-            /* keep previous result */
+            /* keep previous */
           }
         }}
       />

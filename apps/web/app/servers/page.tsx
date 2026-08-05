@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { Cloud, Gauge, Server } from "lucide-react";
+import { Gauge } from "lucide-react";
 import {
   API_BASE,
   Part,
@@ -19,11 +19,7 @@ import { CorrectionDialog } from "@/components/correction-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
-import { AnimatedShinyText } from "@/components/magicui/animated-shiny-text";
-import { BlurFade } from "@/components/magicui/blur-fade";
-import { BorderBeam } from "@/components/magicui/border-beam";
 import { NumberTicker } from "@/components/magicui/number-ticker";
-import { ShineBorder } from "@/components/magicui/shine-border";
 import { cn } from "@/lib/utils";
 
 const SCENE_LABEL: Record<ServerScene, string> = {
@@ -58,7 +54,7 @@ function SpecLine({ part }: { part: Part }) {
     s.region_label ? String(s.region_label) : null,
     s.gpu ? String(s.gpu) : null,
   ].filter(Boolean);
-  return <p className="mt-1 text-xs text-slate-500">{bits.join(" · ")}</p>;
+  return <p className="mt-1 text-xs text-[var(--color-mute)]">{bits.join(" · ")}</p>;
 }
 
 export default function ServersPage() {
@@ -111,35 +107,29 @@ export default function ServersPage() {
   const primary = result?.primary;
 
   return (
-    <main className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6 sm:py-8">
-      <BlurFade delay={0.05} className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <p className="mb-1 text-xs font-semibold uppercase tracking-[0.22em] text-teal-400/80">
-            <AnimatedShinyText className="!inline tracking-[0.22em]">Cloud / VPS Desk</AnimatedShinyText>
-          </p>
-          <h1 className="font-[family-name:var(--font-display)] text-3xl font-bold tracking-tight text-slate-50 sm:text-4xl">
-            服务器选型台
-          </h1>
-          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-slate-400">
-            按月预算与场景过滤规格；目录价为参考月费，活动价纠价入库后供各端复用。
-          </p>
-        </div>
-        <div className="flex items-center gap-2 text-xs text-slate-500">
-          <span className="inline-flex h-2 w-2 rounded-full bg-teal-400 animate-pulse-soft" />
-          {API_BASE.replace(/^https?:\/\//, "")}/api/servers
-        </div>
-      </BlurFade>
+    <main className="mx-auto w-full max-w-[1380px] px-4 py-7 sm:px-6 sm:py-9">
+      <section className="animate-bay-in mb-8">
+        <p className="mb-3 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--color-mute)]">
+          <span className="led-dot" />
+          Cloud Rack · monthly pick
+        </p>
+        <h1 className="max-w-3xl font-[family-name:var(--font-display)] text-4xl font-extrabold tracking-tight text-[var(--color-ink)] sm:text-5xl">
+          <span className="text-[var(--color-copper-bright)]">配智</span>
+          <span className="text-[var(--color-mute)]"> / </span>
+          云主机选型
+        </h1>
+        <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-[var(--color-mute)]">
+          按月预算与场景过滤规格；目录价为参考月费，活动价纠价入库后各端共用。
+        </p>
+        <div className="copper-rule mt-6 max-w-xl" />
+      </section>
 
-      <div className="grid gap-5 lg:grid-cols-[300px_minmax(0,1fr)_260px]">
-        <BlurFade delay={0.1} className="space-y-4 lg:sticky lg:top-20 lg:self-start">
+      <div className="grid gap-5 lg:grid-cols-[290px_minmax(0,1fr)_250px]">
+        <aside className="animate-bay-in space-y-4 [animation-delay:60ms] lg:sticky lg:top-24 lg:self-start">
           <Card>
-            <ShineBorder shineColor={["#2dd4bf", "#22d3ee", "#5eead4"]} duration={14} />
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Cloud className="h-4 w-4 text-teal-300" />
-                筛选条件
-              </CardTitle>
-              <CardDescription>场景矩阵 + 规格下限</CardDescription>
+              <CardTitle>筛选条件</CardTitle>
+              <CardDescription>场景 · 地域 · 规格下限</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={onSubmit} className="space-y-4">
@@ -153,6 +143,7 @@ export default function ServersPage() {
                     value={budget}
                     onChange={(e) => setBudget(Number(e.target.value))}
                     required
+                    className="price-mono"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -190,6 +181,7 @@ export default function ServersPage() {
                       min={1}
                       value={minVcpu}
                       onChange={(e) => setMinVcpu(Number(e.target.value))}
+                      className="price-mono"
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -200,36 +192,36 @@ export default function ServersPage() {
                       min={1}
                       value={minMem}
                       onChange={(e) => setMinMem(Number(e.target.value))}
+                      className="price-mono"
                     />
                   </div>
                 </div>
-                <label className="flex cursor-pointer items-start gap-2.5 rounded-lg border border-white/5 bg-slate-950/40 p-3">
+                <label className="flex cursor-pointer items-start gap-2.5 rounded-md border border-[var(--color-edge)] bg-[var(--color-bay)]/50 p-3">
                   <Checkbox
                     checked={includeLive}
                     onCheckedChange={(v) => setIncludeLive(v === true)}
                     className="mt-0.5"
                   />
-                  <span className="text-xs leading-relaxed text-slate-400">拉取 SerpApi 实时搜索价</span>
+                  <span className="text-xs leading-relaxed text-[var(--color-mute)]">
+                    拉取实时搜索价
+                  </span>
                 </label>
-                <Button type="submit" size="lg" className="relative w-full overflow-hidden" disabled={loading}>
+                <Button type="submit" size="lg" className="w-full" disabled={loading}>
                   {loading ? "选型中…" : "生成推荐"}
-                  {!loading && (
-                    <BorderBeam size={60} duration={5} colorFrom="#ccfbf1" colorTo="#2dd4bf" />
-                  )}
                 </Button>
               </form>
             </CardContent>
           </Card>
-        </BlurFade>
+        </aside>
 
-        <BlurFade delay={0.18} className="min-w-0 space-y-4">
+        <section className="animate-bay-in min-w-0 space-y-4 [animation-delay:120ms]">
           {(error || okMsg) && (
             <div
               className={cn(
-                "rounded-xl border px-4 py-3 text-sm",
+                "rounded-lg border px-4 py-3 text-sm",
                 error
-                  ? "border-rose-400/30 bg-rose-500/10 text-rose-200"
-                  : "border-emerald-400/30 bg-emerald-500/10 text-emerald-200"
+                  ? "border-[var(--color-danger)]/35 bg-[var(--color-danger)]/10 text-[#f0b4ae]"
+                  : "border-[var(--color-solder)]/35 bg-[var(--color-solder)]/10 text-[#9fd9ce]"
               )}
             >
               {error || okMsg}
@@ -237,24 +229,22 @@ export default function ServersPage() {
           )}
 
           {!result && !loading && (
-            <Card className="border-dashed">
-              <CardContent className="flex flex-col items-center justify-center gap-3 py-16 text-center">
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-teal-400/10 text-teal-300">
-                  <Server className="h-7 w-7" />
-                </div>
-                <h2 className="font-[family-name:var(--font-display)] text-lg font-semibold">等待选型结果</h2>
-                <p className="max-w-sm text-sm text-slate-400">
-                  左侧设好月预算与场景后，这里会列出主推套餐与备选方案。
-                </p>
-              </CardContent>
-            </Card>
+            <div className="bay-panel bay-sheet flex flex-col items-start justify-center gap-4 rounded-xl px-6 py-16 sm:px-10">
+              <p className="font-[family-name:var(--font-display)] text-2xl font-bold text-[var(--color-ink)]">
+                还没有候选套餐
+              </p>
+              <p className="max-w-md text-sm leading-relaxed text-[var(--color-mute)]">
+                左侧设好月预算与场景后，这里会列出主推与备选，并带评分理由。
+              </p>
+              <div className="copper-rule w-40" />
+            </div>
           )}
 
           {loading && (
             <Card>
               <CardContent className="space-y-3 py-8">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-20 animate-pulse rounded-xl bg-white/5" />
+                  <div key={i} className="h-20 animate-pulse rounded-md bg-[var(--color-edge)]/40" />
                 ))}
               </CardContent>
             </Card>
@@ -262,86 +252,85 @@ export default function ServersPage() {
 
           {result && !loading && (
             <Card>
-              <BorderBeam size={120} duration={10} colorFrom="#2dd4bf" colorTo="#99f6e4" />
-              <CardHeader className="border-b border-white/5">
+              <CardHeader className="border-b border-[var(--color-edge)]">
                 <CardTitle>推荐套餐</CardTitle>
                 <CardDescription>{rows.length} 个候选 · 按评分排序</CardDescription>
               </CardHeader>
-              <CardContent className="p-0">
-                <ul className="divide-y divide-white/5">
+              <CardContent className="bay-sheet p-0">
+                <ul>
                   {rows.map((item, idx) => (
-                    <BlurFade key={item.part.id} delay={0.05 + idx * 0.05} inView>
-                      <li
-                        className={cn(
-                          "flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between",
-                          idx === 0 && "bg-teal-400/[0.04]"
-                        )}
-                      >
-                        <div className="min-w-0 flex-1">
-                          <div className="mb-1 flex flex-wrap items-center gap-2">
-                            <Badge variant={idx === 0 ? "verified" : "muted"}>#{item.rank}</Badge>
-                            <Badge variant={SOURCE_VARIANT[item.price_source] || "default"}>
-                              {SOURCE_LABEL[item.price_source] || item.price_source}
-                            </Badge>
-                            <span className="inline-flex items-center gap-1 text-xs text-slate-500">
-                              <Gauge className="h-3 w-3" />
-                              评分 {item.score}
-                            </span>
-                          </div>
-                          <p className="font-medium text-slate-100">{item.part.name}</p>
-                          <SpecLine part={item.part} />
-                          <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
-                            {item.reasons.join("；")}
+                    <li
+                      key={item.part.id}
+                      className={cn(
+                        "animate-bay-in flex flex-col gap-3 border-b border-[var(--color-edge)]/70 px-5 py-4 sm:flex-row sm:items-center sm:justify-between",
+                        idx === 0 && "bg-[var(--color-copper)]/[0.06]"
+                      )}
+                      style={{ animationDelay: `${80 + idx * 45}ms` }}
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="mb-1 flex flex-wrap items-center gap-2">
+                          <Badge variant={idx === 0 ? "default" : "muted"}>#{item.rank}</Badge>
+                          <Badge variant={SOURCE_VARIANT[item.price_source] || "default"}>
+                            {SOURCE_LABEL[item.price_source] || item.price_source}
+                          </Badge>
+                          <span className="inline-flex items-center gap-1 text-xs text-[var(--color-mute)]">
+                            <Gauge className="h-3 w-3" />
+                            评分 {item.score}
+                          </span>
+                        </div>
+                        <p className="font-medium text-[var(--color-ink)]">{item.part.name}</p>
+                        <SpecLine part={item.part} />
+                        <p className="mt-1.5 text-xs leading-relaxed text-[var(--color-mute)]">
+                          {item.reasons.join("；")}
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-3 sm:justify-end">
+                        <div className="text-right">
+                          <p className="price-mono text-lg font-semibold text-[var(--color-voltage)]">
+                            ¥
+                            <NumberTicker
+                              value={Math.round(item.effective_price)}
+                              className="text-[var(--color-voltage)]"
+                            />
                           </p>
+                          <p className="text-[11px] text-[var(--color-mute)]">{item.price_unit}</p>
                         </div>
-                        <div className="flex flex-wrap items-center gap-3 sm:justify-end">
-                          <div className="text-right">
-                            <p className="price-mono text-lg font-semibold text-teal-200">
-                              ¥
-                              <NumberTicker
-                                value={Math.round(item.effective_price)}
-                                className="text-teal-200"
-                              />
-                            </p>
-                            <p className="text-[11px] text-slate-500">{item.price_unit}</p>
-                          </div>
-                          <div className="flex gap-1.5">
-                            {item.buy_links.official && (
-                              <a
-                                href={item.buy_links.official}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="rounded-md bg-white/5 px-2 py-1 text-xs text-slate-300 no-underline hover:bg-white/10"
-                              >
-                                官网
-                              </a>
-                            )}
-                            {item.buy_links.jd && (
-                              <a
-                                href={item.buy_links.jd}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="rounded-md bg-white/5 px-2 py-1 text-xs text-slate-300 no-underline hover:bg-white/10"
-                              >
-                                京东搜
-                              </a>
-                            )}
-                          </div>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              setCorrectPart(item.part);
-                              setCorrectPrice(String(Math.round(item.effective_price)));
-                              setCorrectUrl(item.buy_links.official || "");
-                            }}
-                          >
-                            纠价
-                          </Button>
+                        <div className="flex gap-1.5">
+                          {item.buy_links.official && (
+                            <a
+                              href={item.buy_links.official}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="rounded border border-[var(--color-edge)] bg-[var(--color-rail)] px-2 py-1 text-xs text-[var(--color-aluminum)] no-underline hover:border-[var(--color-copper)]/40"
+                            >
+                              官网
+                            </a>
+                          )}
+                          {item.buy_links.jd && (
+                            <a
+                              href={item.buy_links.jd}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="rounded border border-[var(--color-edge)] bg-[var(--color-rail)] px-2 py-1 text-xs text-[var(--color-aluminum)] no-underline hover:border-[var(--color-copper)]/40"
+                            >
+                              京东搜
+                            </a>
+                          )}
                         </div>
-                      </li>
-                    </BlurFade>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setCorrectPart(item.part);
+                            setCorrectPrice(String(Math.round(item.effective_price)));
+                            setCorrectUrl(item.buy_links.official || "");
+                          }}
+                        >
+                          纠价
+                        </Button>
+                      </div>
+                    </li>
                   ))}
                 </ul>
               </CardContent>
@@ -353,34 +342,35 @@ export default function ServersPage() {
               {result.notes.map((n) => (
                 <li
                   key={n}
-                  className="rounded-xl border border-teal-400/20 bg-teal-400/5 px-4 py-2.5 text-sm text-teal-100/90"
+                  className="rounded-lg border border-[var(--color-edge)] bg-[var(--color-panel)]/80 px-4 py-2.5 text-sm text-[var(--color-aluminum)]"
                 >
                   {n}
                 </li>
               ))}
             </ul>
           )}
-        </BlurFade>
+        </section>
 
-        <BlurFade delay={0.26} className="space-y-4 lg:sticky lg:top-20 lg:self-start">
-          <Card className="border-teal-400/20 bg-gradient-to-b from-teal-950/40 to-slate-900/70">
-            <BorderBeam size={100} duration={8} colorFrom="#2dd4bf" colorTo="#5eead4" />
+        <aside className="animate-bay-in space-y-4 [animation-delay:180ms] lg:sticky lg:top-24 lg:self-start">
+          <Card className="border-[var(--color-copper)]/25">
             <CardHeader>
-              <CardTitle>主推方案</CardTitle>
+              <CardTitle className="text-[var(--color-voltage)]">主推方案</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {primary ? (
                 <>
-                  <p className="text-sm font-medium leading-snug text-slate-100">{primary.part.name}</p>
-                  <p className="price-mono text-3xl font-bold text-slate-50">
+                  <p className="text-sm font-medium leading-snug text-[var(--color-ink)]">
+                    {primary.part.name}
+                  </p>
+                  <p className="price-mono text-3xl font-bold text-[var(--color-ink)]">
                     ¥
                     <NumberTicker
                       value={Math.round(primary.effective_price)}
                       className="text-3xl font-bold"
                     />
-                    <span className="ml-1 text-sm font-normal text-slate-500">/月</span>
+                    <span className="ml-1 text-sm font-normal text-[var(--color-mute)]">/月</span>
                   </p>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-[var(--color-mute)]">
                     评分 <NumberTicker value={primary.score} />
                   </p>
                   <Button
@@ -393,8 +383,11 @@ export default function ServersPage() {
                   </Button>
                 </>
               ) : (
-                <p className="text-sm text-slate-500">生成后显示最优套餐摘要。</p>
+                <p className="text-sm text-[var(--color-mute)]">生成后显示最优套餐摘要。</p>
               )}
+              <p className="text-[10px] tracking-wide text-[var(--color-mute)]">
+                {API_BASE.replace(/^https?:\/\//, "")}/api/servers
+              </p>
             </CardContent>
           </Card>
 
@@ -403,9 +396,11 @@ export default function ServersPage() {
               <CardTitle className="text-sm">提示</CardTitle>
             </CardHeader>
             <CardContent>
-              {!result && <p className="text-sm text-slate-500">选型后显示告警与说明。</p>}
+              {!result && <p className="text-sm text-[var(--color-mute)]">选型后显示告警与说明。</p>}
               {result && result.issues.length === 0 && (
-                <p className="rounded-lg bg-emerald-400/10 px-3 py-2 text-sm text-emerald-300">无严重问题</p>
+                <p className="rounded-md bg-[var(--color-solder)]/10 px-3 py-2 text-sm text-[var(--color-solder)]">
+                  无严重问题
+                </p>
               )}
               {result && result.issues.length > 0 && (
                 <ul className="space-y-2">
@@ -413,10 +408,10 @@ export default function ServersPage() {
                     <li
                       key={`${i.code}-${i.message}`}
                       className={cn(
-                        "rounded-lg px-3 py-2 text-xs",
-                        i.severity === "error" && "bg-rose-500/15 text-rose-200",
-                        i.severity === "warning" && "bg-amber-500/15 text-amber-100",
-                        i.severity === "info" && "bg-teal-500/10 text-teal-100"
+                        "rounded-md px-3 py-2 text-xs",
+                        i.severity === "error" && "bg-[var(--color-danger)]/15 text-[#f0b4ae]",
+                        i.severity === "warning" && "bg-[var(--color-warn)]/15 text-[#f0c4a8]",
+                        i.severity === "info" && "bg-[var(--color-solder)]/10 text-[#9fd9ce]"
                       )}
                     >
                       [{i.severity}] {i.message}
@@ -426,7 +421,7 @@ export default function ServersPage() {
               )}
             </CardContent>
           </Card>
-        </BlurFade>
+        </aside>
       </div>
 
       <CorrectionDialog
