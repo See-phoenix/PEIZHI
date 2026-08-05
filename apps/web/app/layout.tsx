@@ -1,6 +1,25 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Space_Grotesk, IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
+import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
+
+const display = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-display",
+  weight: ["500", "600", "700"],
+});
+
+const body = IBM_Plex_Sans({
+  subsets: ["latin"],
+  variable: "--font-body",
+  weight: ["400", "500", "600"],
+});
+
+const mono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+  weight: ["400", "500", "600"],
+});
 
 export const metadata: Metadata = {
   title: "PEIZHI 配智",
@@ -9,19 +28,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="zh-CN">
-      <body>
-        <header className="topnav">
-          <div className="topnav-inner">
-            <Link href="/" className="brand">
-              PEIZHI 配智
-            </Link>
-            <nav>
-              <Link href="/">装机配置</Link>
-              <Link href="/servers">服务器选型</Link>
-            </nav>
-          </div>
-        </header>
+    <html lang="zh-CN" className={`${display.variable} ${body.variable} ${mono.variable}`}>
+      <body className="font-[family-name:var(--font-body)]">
+        <SiteHeader />
         {children}
       </body>
     </html>
